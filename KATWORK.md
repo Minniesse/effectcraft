@@ -15,6 +15,34 @@ Based on EffectCraft by the ArtCraft team (https://github.com/storytold/effectcr
 | Patch | Upstream PR |
 |---|---|
 | `chore(katwork): remove the ArtCraft marks` | not proposed upstream (the brand terms let a fork that proposes changes keep the marks; this one is a distributed modified version) |
+| `feat(katwork): model-download feature, on by default` | draft, not opened (in the fork PR body) |
+| `feat(katwork): plugins feature, on by default` | draft, not opened (in the fork PR body) |
+| `feat(katwork): scripting feature, on by default` | draft, not opened (in the fork PR body) |
+| `feat(katwork): self-update feature, on by default` | draft, not opened (in the fork PR body) |
+
+## The KatWork build
+
+KatWork builds the CLI (`effectcraft-cli`) and the web build (`apps/effectcraft-web`, `cargo xtask web`) with
+`--no-default-features`. Each gate below is a Cargo feature that is on by default, so an upstream build is unchanged:
+
+- `model-download` (in `effectcraft-engine`): `roto.model.download` and `face.model.download`, which run the system `curl`.
+  Off: both commands are unknown; Install from File stays, and Settings shows no Download button.
+- `plugins` (in `effectcraft-host`, forwarding the engine's `plugins`): the WebAssembly effect plug-in runtime
+  (`effectcraft-plugin`, wasmi), the external effect helpers (`effectcraft-helper-host`, which start helper programs as child
+  processes) and the Plug-in Library's https downloads. Off: the session has no plug-in loader and no helpers, so
+  `effect.plugins.load`, `library.*` installs and `effect.helpers.*` answer that they are not available in this build (the
+  engine's existing answer); a project that uses a plug-in effect opens and renders without it.
+- `scripting` (in `effectcraft-host`; R44): the ExtendScript runner `effectcraft-script` (`script.run`, File ▸ Scripts, the MCP
+  `run_script` tool, the Script Console). Off: they answer "JavaScript scripting is not available in this build" (the engine's
+  existing answer). Document expressions (`effectcraft-expr`, boa) stay: they are document data, evaluated with their own
+  limits, and have no file or socket access.
+- `self-update` (in `effectcraft-ui-egui`): the release checker and self-updater `craft-update` and its HTTPS client (`ureq`,
+  `rustls`), which the CLI links through the UI crate (the `bench` UI operations). Off: Check for Updates says it is not
+  available in this build.
+
+`scripts/katwork-profile.sh` (CI job `katwork-profile`) checks that these crates and engine features are not in the KatWork
+build graphs, with a control that each is in the upstream build, and runs `crates/host/tests/katwork_profile.rs` with the
+features off.
 
 ## The marks
 

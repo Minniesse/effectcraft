@@ -41,12 +41,17 @@ bytemuck = { workspace = true }
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # Floating panels open in OS windows of their own on desktop; the web keeps them in the page.
 craft-ui = { workspace = true, features = ["native-windows"] }
-craft-update = { workspace = true }
+# The release checker and self-updater (`self-update`, default on).
+craft-update = { workspace = true, optional = true }
 # Waits for the display pass's error scopes (immediately ready on native wgpu).
 pollster = { workspace = true }
 sys-locale = { workspace = true }
 
 [features]
+default = ["self-update"]
+# Help ▸ Check for Updates, the check at start and Restart to Update on native builds (craft-update:
+# a GitHub release client). Without it Check for Updates says it is not available in this build.
+self-update = ["dep:craft-update"]
 # Tests only, never enable in a product: Settings ▸ General ▸ Language ▸ Match System resolves to
 # English, so English label lookups pass on any system language (#3244). The self dev-dependency
 # below turns it on wherever dev-dependencies are built: this crate's integration tests, its

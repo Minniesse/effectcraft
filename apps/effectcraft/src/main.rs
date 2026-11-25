@@ -335,7 +335,7 @@ fn main() -> eframe::Result {
 fn run_desktop(reporter: &crash_report::Shutdown, arguments: &[std::ffi::OsString]) -> eframe::Result {
     // Windows: the update helper is a copy of this program started with `--finish-update`. A Nightly
     // build is never updated by the stable feed; ArtCraft Launcher replaces it.
-    #[cfg(windows)]
+    #[cfg(all(windows, feature = "self-update"))]
     if stable_services()
         && let Some(result) = craft_update::self_update::finish(&effectcraft_ui_egui::UPDATE_APP, arguments)
     {

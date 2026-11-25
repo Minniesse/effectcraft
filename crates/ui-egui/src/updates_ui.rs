@@ -1,38 +1,33 @@
-//! Software updates, background check at startup, and startup prompt modal.
+//! Software updates, background check at startup, and startup prompt modal. Native builds with the
+//! `self-update` feature (default on) check and install releases through craft-update; the web
+//! build and builds without the feature answer Check for Updates with a message instead.
 
 use crate::EffectcraftApp;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 use craft_update::dialog::{CheckResultDialog, CheckResultResponse};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 use craft_update::updater::{Action, Status, Updater};
 
+// Without the updater every field has its default (the web build, and native builds without `self-update`).
+#[cfg_attr(any(target_arch = "wasm32", not(feature = "self-update")), derive(Default))]
 pub(crate) struct Runtime {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
     pub(crate) updater: Updater,
     /// The desktop app turns the check at start on; tests and the web build leave it off.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
     startup_check: bool,
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
     check_requested: bool,
     pub(crate) manual_window_open: bool,
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(any(target_arch = "wasm32", not(feature = "self-update")))]
     pub(crate) status_message: Option<String>,
 }
 
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 impl Default for Runtime {
     fn default() -> Self {
-        Self {
-            #[cfg(not(target_arch = "wasm32"))]
-            updater: Updater::new(&crate::UPDATE_APP, env!("CARGO_PKG_VERSION")),
-            #[cfg(not(target_arch = "wasm32"))]
-            startup_check: false,
-            #[cfg(not(target_arch = "wasm32"))]
-            check_requested: false,
-            manual_window_open: false,
-            #[cfg(target_arch = "wasm32")]
-            status_message: None,
-        }
+        Self { updater: Updater::new(&crate::UPDATE_APP, env!("CARGO_PKG_VERSION")), startup_check: false, check_requested: false, manual_window_open: false }
     }
 }
 
@@ -40,14 +35,19 @@ impl EffectcraftApp {
     /// Whether the app asks for a newer release when it starts (off until the desktop app turns it on).
     #[cfg(not(target_arch = "wasm32"))]
     pub fn set_startup_update_check(&mut self, on: bool) {
-        self.updates_rt.startup_check = on;
+        #[cfg(feature = "self-update")]
+        {
+            self.updates_rt.startup_check = on;
+        }
+        #[cfg(not(feature = "self-update"))]
+        let _ = on;
     }
 }
 
 /// Restart to Update. With unsaved changes the result dialog closes and the window is asked to
 /// close, so the unsaved-changes prompt opens. Cancel there leaves the update ready. An open
 /// startup prompt keeps its own Restart to Update and save-first note, so the window stays open.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 pub(crate) fn restart_to_update(rt: &mut Runtime, ctx: &egui::Context, clean: bool) {
     if clean {
         rt.updater.restart_to_update();
@@ -71,20 +71,22 @@ pub(crate) fn check(app: &mut EffectcraftApp) {
         app.ui.status = "Updates come with the ArtCraft Launcher's Nightly channel.".into();
         return;
     }
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
     {
         app.updates_rt.check_requested = true;
         app.updates_rt.manual_window_open = true;
     }
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(any(target_arch = "wasm32", not(feature = "self-update")))]
     {
         app.updates_rt.manual_window_open = true;
-        app.updates_rt.status_message = Some(crate::i18n::tr("Update check is not supported in the web browser.").to_string());
+        let message =
+            if cfg!(target_arch = "wasm32") { "Update check is not supported in the web browser." } else { "Update check is not available in this build." };
+        app.updates_rt.status_message = Some(crate::i18n::tr(message).to_string());
     }
 }
 
 pub(crate) fn tick(app: &mut EffectcraftApp, ctx: &egui::Context) {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
     {
         let rt = &mut app.updates_rt;
         if std::mem::take(&mut rt.check_requested) {
@@ -94,7 +96,7 @@ pub(crate) fn tick(app: &mut EffectcraftApp, ctx: &egui::Context) {
         }
         rt.updater.tick(ctx);
     }
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(any(target_arch = "wasm32", not(feature = "self-update")))]
     let _ = (app, ctx);
 }
 
@@ -102,13 +104,13 @@ pub(crate) fn tick(app: &mut EffectcraftApp, ctx: &egui::Context) {
 /// requested check ends, and it shows whenever the status is not idle: at the first start after an
 /// update, the check at start leaves `Updated` or `InstallFailed`. A check that finds a release
 /// leaves the status idle and the startup prompt takes over, so the dialog closes then.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 pub(crate) fn result_window_open(open: bool, status: &Status, check_requested: bool) -> bool {
     !matches!(status, Status::Idle) || (open && check_requested)
 }
 
 pub(crate) fn show(app: &mut EffectcraftApp, ctx: &egui::Context) {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
     {
         // The restart helper is scheduled before the app closes, so no update starts over unsaved work.
         let clean = !app.session.is_dirty();
@@ -132,7 +134,7 @@ pub(crate) fn show(app: &mut EffectcraftApp, ctx: &egui::Context) {
         }
     }
 
-    #[cfg(target_arch = "wasm32")]
+    #[cfg(any(target_arch = "wasm32", not(feature = "self-update")))]
     if app.updates_rt.manual_window_open {
         let mut open = true;
         let mut close = false;

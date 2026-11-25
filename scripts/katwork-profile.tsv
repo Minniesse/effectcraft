@@ -16,3 +16,8 @@ effectcraft-web wasm32 - effectcraft-script present
 # model-download: the curl model downloads (a feature of the engine, no crate)
 effectcraft-cli native - effectcraft-engine/model-download present
 effectcraft-web wasm32 - effectcraft-engine/model-download present
+# self-update: the release checker and self-updater and its HTTPS client (native only: the web
+# package does not resolve them on any target, so it has no rows here)
+effectcraft-cli native - craft-update present
+effectcraft-cli native - ureq present
+effectcraft-cli native - rustls present

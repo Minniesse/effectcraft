@@ -225,7 +225,7 @@ fn workspace_layout_autosave_writes_on_a_hidden_tick() {
 }
 
 /// Whether a frame running `f` asked the root window to close.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn asks_to_close(ctx: &egui::Context, mut f: impl FnMut(&egui::Context)) -> bool {
     let mut out = ctx.run_ui(raw(egui::vec2(800.0, 480.0)), |ui| f(ui.ctx()));
     out.textures_delta.clear();
@@ -233,7 +233,7 @@ fn asks_to_close(ctx: &egui::Context, mut f: impl FnMut(&egui::Context)) -> bool
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn restart_to_update_with_unsaved_changes_opens_the_unsaved_changes_prompt() {
     let ctx = egui::Context::default();
     let frame = eframe::Frame::_new_kittest();
@@ -250,7 +250,7 @@ fn restart_to_update_with_unsaved_changes_opens_the_unsaved_changes_prompt() {
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn restart_to_update_with_nothing_unsaved_leaves_the_close_to_the_updater() {
     let ctx = egui::Context::default();
     let mut app = app_with_comp();
@@ -260,7 +260,7 @@ fn restart_to_update_with_nothing_unsaved_leaves_the_close_to_the_updater() {
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn restart_to_update_with_the_startup_prompt_open_leaves_the_window_open() {
     let ctx = egui::Context::default();
     let mut app = app_with_comp();
@@ -294,7 +294,7 @@ fn the_close_guard_answers_a_close_request_without_a_pass() {
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn the_update_result_dialog_shows_every_status_but_idle() {
     use craft_update::updater::Status;
     let shown = [
@@ -616,4 +616,15 @@ fn an_element_that_moves_while_the_ui_settles_is_captured_where_it_is() {
     let value = reply.try_recv().expect("the capture replies");
     assert_eq!(value["ok"], true, "{value}");
     assert_eq!((value["result"]["width"].as_u64(), value["result"]["height"].as_u64()), (Some(300), Some(200)), "{value}");
+}
+
+/// A native build without `self-update` (the KatWork build) links no updater: Help ▸ Check for
+/// Updates says so instead of checking.
+#[test]
+#[cfg(all(not(target_arch = "wasm32"), not(feature = "self-update")))]
+fn check_for_updates_without_self_update_says_it_is_not_available() {
+    let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+    updates_ui::check(&mut app);
+    assert!(app.updates_rt.manual_window_open);
+    assert_eq!(app.updates_rt.status_message.as_deref(), Some("Update check is not available in this build."));
 }

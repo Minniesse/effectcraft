@@ -10,12 +10,14 @@ default-run = "effectcraft"
 workspace = true
 
 [features]
-default = ["model-download", "plugins", "scripting"]
+default = ["model-download", "plugins", "scripting", "self-update"]
 model-download = ["effectcraft-host/model-download"]
 # WebAssembly effect plug-ins, the Plug-in Library and external effect helpers; also the
 # start-up load of <config>/Plug-ins.
 plugins = ["effectcraft-host/plugins"]
 scripting = ["effectcraft-host/scripting"]
+# The update check and self-updater (craft-update).
+self-update = ["effectcraft-ui-egui/self-update", "dep:craft-update"]
 
 [dependencies]
 effectcraft-engine = { workspace = true }
@@ -69,6 +71,6 @@ objc2-app-kit = { version = "0.3", default-features = false, features = ["std", 
 fmv-macos-events = "=0.1.0"
 
 [target.'cfg(windows)'.dependencies]
-craft-update = { workspace = true }
+craft-update = { workspace = true, optional = true }
 # SetCurrentProcessExplicitAppUserModelID: the Nightly window's own taskbar identity.
 winsafe = { version = "=0.0.29", default-features = false, features = ["user", "shell"] }
