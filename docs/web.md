@@ -19,6 +19,7 @@ and on the user's machine.
 cargo xtask web                 # release build → <target>/web/dist
 cargo xtask web --dev           # unoptimised build (faster to compile, slow to run)
 cargo xtask web --serve 8765    # build, then serve dist on http://127.0.0.1:8765/
+cargo xtask web --no-default-features --features scripting   # Cargo features of the web crate (default: all on)
 ```
 
 `<target>` is `$CARGO_TARGET_DIR` or `target`. `dist` holds `index.html`, `effectcraft_web.js` +

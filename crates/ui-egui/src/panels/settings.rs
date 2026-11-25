@@ -646,7 +646,9 @@ fn models_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut
                 return;
             }
             ui.horizontal(|ui| {
-                if !installed && !web && m["url"].as_str().is_some_and(|url| !url.is_empty()) {
+                // A build without model downloads has no `*.model.download` command: no Download button.
+                let downloads = effectcraft_engine::commands::find(&format!("{prefix}.model.download")).is_some();
+                if !installed && !web && downloads && m["url"].as_str().is_some_and(|url| !url.is_empty()) {
                     let r = ui.add_enabled(busy.is_none(), egui::Button::new(tr("Download")));
                     reg(app, &format!("settings.{prefix}.download.{id}"), &r, "Download");
                     if r.clicked() {

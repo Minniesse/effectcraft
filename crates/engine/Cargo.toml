@@ -9,6 +9,12 @@ rust-version.workspace = true
 [lints]
 workspace = true
 
+[features]
+default = ["model-download"]
+# `roto.model.download` and `face.model.download`: fetch model weights with the system curl.
+# Without it those commands are unknown; Install from File still works.
+model-download = []
+
 [dependencies]
 craft-docpath = { workspace = true }
 effectcraft-time = { workspace = true }

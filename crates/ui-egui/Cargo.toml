@@ -63,7 +63,8 @@ egui = { workspace = true, features = ["default_fonts", "monochrome_emoji_fonts"
 egui_kittest = { workspace = true, features = ["eframe", "wgpu"] }
 pollster = "1"
 effectcraft-segment = { workspace = true }
-effectcraft-host = { workspace = true }
+# The tests drive a fully wired session, as the desktop app's default build has.
+effectcraft-host = { workspace = true, features = ["model-download"] }
 effectcraft-media = { workspace = true }
 exr = { workspace = true }
 tempfile = { workspace = true }

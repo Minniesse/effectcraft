@@ -4,8 +4,9 @@
 //!   listed same-layer edges, no UI/OS crates below L5).
 //! - `wasm`: `cargo check --target wasm32-unknown-unknown` for every crate in L0–L4, the egui UI
 //!   and the web app.
-//! - `web [--dev] [--serve PORT]`: build the web app (`apps/effectcraft-web`) into
-//!   `<target>/web/dist` with `wasm-bindgen` (docs/web.md); `--serve` serves it on localhost.
+//! - `web [--dev] [--serve PORT] [--no-default-features] [--features LIST]`: build the web app
+//!   (`apps/effectcraft-web`) into `<target>/web/dist` with `wasm-bindgen` (docs/web.md); `--serve`
+//!   serves it on localhost; the feature flags go to its `cargo build` (and nowhere else).
 //! - `lock-patches`: `Cargo.lock` records no unused `[patch]` entry (the Nix build cannot vendor one).
 //! - `assets`: every asset file (image, icon, font, LUT, audio, video…) has a complete
 //!   `<file>.attribution` sidecar and an entry in `ATTRIBUTION.md` (AGENTS.md §1).
@@ -273,6 +274,7 @@ fn web(args: &[String]) -> Result<(), String> {
     let profile = if dev { "dev" } else { "release" };
     let mut build = Command::new(env!("CARGO"));
     build.args(["build", "--target", "wasm32-unknown-unknown", "-p", "effectcraft-web", "--profile", profile]);
+    build.args(web_feature_args(args)?);
     run(&mut build)?;
     let out = Command::new("wasm-bindgen")
         .arg("--version")
@@ -613,7 +615,7 @@ fn main() -> ExitCode {
             let rest: Vec<String> = std::env::args().skip(2).collect();
             version::run(&root(), &rest.iter().map(String::as_str).collect::<Vec<_>>())
         }
-        _ => Err("usage: cargo xtask <layers|assets|pdf-deps|lock-patches|aep-corpus [--dir DIR]|wasm|web [--dev] [--serve PORT]|ico OUT.ico IN.png…|version [set X.Y.Z]|ci [--affected [--base REV] [--dry-run]]|audio-backend|bench [--bin CLI] [--quick] [--project F --comp C] [--compare OLD.jsonl] (--help)>".into()),
+        _ => Err("usage: cargo xtask <layers|assets|pdf-deps|lock-patches|aep-corpus [--dir DIR]|wasm|web [--dev] [--serve PORT] [--no-default-features] [--features LIST]|ico OUT.ico IN.png…|version [set X.Y.Z]|ci [--affected [--base REV] [--dry-run]]|audio-backend|bench [--bin CLI] [--quick] [--project F --comp C] [--compare OLD.jsonl] (--help)>".into()),
     };
     match r {
         Ok(()) => ExitCode::SUCCESS,
@@ -625,6 +627,41 @@ fn main() -> ExitCode {
 }
 
 /// The workspace root (the parent of `xtask/`).
+/// The Cargo feature flags of `cargo xtask web` (`--no-default-features`, `--features LIST`), for
+/// its `cargo build` only.
+fn web_feature_args(args: &[String]) -> Result<Vec<String>, String> {
+    let mut out = Vec::new();
+    if args.iter().any(|a| a == "--no-default-features") {
+        out.push("--no-default-features".to_string());
+    }
+    if let Some(i) = args.iter().position(|a| a == "--features") {
+        let list = args.get(i + 1).filter(|l| !l.starts_with("--")).ok_or("--features needs a comma-separated list")?;
+        out.extend(["--features".to_string(), list.clone()]);
+    }
+    Ok(out)
+}
+
+#[cfg(test)]
+mod web_tests {
+    use super::web_feature_args;
+
+    fn args(a: &[&str]) -> Vec<String> {
+        a.iter().map(|s| s.to_string()).collect()
+    }
+
+    #[test]
+    fn web_forwards_only_the_feature_flags() {
+        assert!(web_feature_args(&args(&["--dev", "--serve", "8765"])).unwrap().is_empty());
+        assert_eq!(web_feature_args(&args(&["--no-default-features"])).unwrap(), args(&["--no-default-features"]));
+        assert_eq!(
+            web_feature_args(&args(&["--dev", "--no-default-features", "--features", "scripting,plugins"])).unwrap(),
+            args(&["--no-default-features", "--features", "scripting,plugins"])
+        );
+        assert!(web_feature_args(&args(&["--features"])).is_err());
+        assert!(web_feature_args(&args(&["--features", "--dev"])).is_err());
+    }
+}
+
 pub fn root() -> std::path::PathBuf {
     std::path::Path::new(env!("CARGO_MANIFEST_DIR")).parent().map(std::path::Path::to_path_buf).unwrap_or_else(|| std::path::PathBuf::from("."))
 }
