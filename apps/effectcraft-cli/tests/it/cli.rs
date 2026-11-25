@@ -561,6 +561,7 @@ fn mcp_over_stdio() {
 }
 
 #[test]
+#[cfg(feature = "scripting")]
 fn script_file_and_eval() {
     let proj = tmp("scripted.ecproj");
     let p = proj.to_str().unwrap();
@@ -1079,6 +1080,7 @@ fn bench_roto_reports_why_a_named_model_file_failed() {
 
 /// Render uses the same empty/project/demo selection as the other CLI commands.
 #[test]
+#[cfg(feature = "scripting")]
 fn render_empty_does_not_load_the_demo() {
     let root = tmp("render-empty");
     let _ = std::fs::remove_dir_all(&root);

@@ -1,6 +1,8 @@
 //! The crate's integration tests, one binary (each module is a former `tests/<name>.rs`).
 
 mod cli;
+// Every template test builds its template with a script.
+#[cfg(feature = "scripting")]
 mod qa_template;
 
 /// Nextest archives relocate binaries; plain Cargo keeps the compile-time path valid.

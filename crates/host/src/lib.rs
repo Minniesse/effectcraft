@@ -2,6 +2,13 @@
 //! the media importer, the expression engine, JavaScript scripting (`effectcraft-script`) and
 //! Render Queue export through `effectcraft-export` (craft-libs' encoders). Frontends (desktop,
 //! CLI, MCP, web) start here.
+//!
+//! Features (all default on): `plugins` links the WebAssembly effect plug-in runtime
+//! (`effectcraft-plugin`) and the external effect helpers (`effectcraft-helper-host`, child
+//! processes); `scripting` links the JavaScript script runner (`effectcraft-script`);
+//! `model-download` keeps the engine's model downloads. Without them the session answers that
+//! plug-ins and scripts are not available in this build, and the download commands are unknown.
+//! Document expressions (`effectcraft-expr`) are always linked.
 
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
@@ -10,6 +17,7 @@ use std::sync::Arc;
 use effectcraft_engine::project::render_queue::OutputFormat;
 use effectcraft_engine::{ExportJob, ExportResult, Exporter, Importer, Session};
 use effectcraft_project::Footage;
+#[cfg(feature = "scripting")]
 pub use effectcraft_script as script;
 
 pub mod app_dirs;
@@ -115,6 +123,7 @@ pub fn session() -> Session {
         plugins_dir: config_dir().map(|d| d.join("Plug-ins")),
         ..Default::default()
     };
+    #[cfg(feature = "scripting")]
     effectcraft_script::install(&mut s);
     // The caches' common budget from the start (#3298): the CLI and the MCP server never load
     // the settings, and the caches have no limits of their own below it. Without a memory

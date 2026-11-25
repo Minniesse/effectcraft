@@ -10,10 +10,12 @@ rust-version.workspace = true
 workspace = true
 
 [features]
-default = ["plugins", "model-download"]
+default = ["plugins", "scripting", "model-download"]
 # WebAssembly effect plug-ins (wasmi, native only) and the external effect helpers (child
 # processes): `effect.plugins.load`, the Plug-in Library, `effect.helpers.*`.
 plugins = ["dep:effectcraft-plugin", "dep:effectcraft-helper-host", "effectcraft-engine/plugins"]
+# The JavaScript script runner: `script.run`, File ▸ Scripts, the Script Console.
+scripting = ["dep:effectcraft-script"]
 # Model weight downloads (`roto.model.download`, `face.model.download`).
 model-download = ["effectcraft-engine/model-download"]
 
@@ -23,7 +25,7 @@ effectcraft-project = { workspace = true }
 log = { workspace = true }
 effectcraft-media = { workspace = true }
 effectcraft-expr = { workspace = true }
-effectcraft-script = { workspace = true }
+effectcraft-script = { workspace = true, optional = true }
 effectcraft-export = { workspace = true }
 effectcraft-plugin = { workspace = true, optional = true }
 serde_json = { workspace = true }

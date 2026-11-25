@@ -1,0 +1,18 @@
+# The KatWork build of EffectCraft: CLI and web with --no-default-features (the lock's features: -).
+# <package> <native|wasm32> <katwork-features|-> <crate, or dep/feature> <control>
+# plugins: the WebAssembly runtime and the external effect helpers
+effectcraft-cli native - effectcraft-plugin present
+effectcraft-cli native - wasmi present
+effectcraft-cli native - effectcraft-helper-host present
+effectcraft-web wasm32 - effectcraft-plugin present
+effectcraft-web wasm32 - wasmi absent
+effectcraft-web wasm32 - effectcraft-helper-host absent
+# plugins: the Plug-in Library's https downloads (a feature of the engine, no crate)
+effectcraft-cli native - effectcraft-engine/plugins present
+effectcraft-web wasm32 - effectcraft-engine/plugins present
+# scripting: the ExtendScript runner (document expressions, effectcraft-expr, stay)
+effectcraft-cli native - effectcraft-script present
+effectcraft-web wasm32 - effectcraft-script present
+# model-download: the curl model downloads (a feature of the engine, no crate)
+effectcraft-cli native - effectcraft-engine/model-download present
+effectcraft-web wasm32 - effectcraft-engine/model-download present
