@@ -1,11 +1,11 @@
 ---
 title: Install EffectCraft
-description: Download EffectCraft for Windows 11, macOS or Linux, install it, or install it through ArtCraft Launcher.
+description: Download EffectCraft for Windows 11, macOS or Linux and install it.
 order: 10
 verified: 0.9.2
 ---
 
-The easiest way is the [EffectCraft page on getartcraft.com](https://getartcraft.com/apps/effectcraft). For a specific file, use the [latest release](https://github.com/storytold/effectcraft/releases/latest) on GitHub. In the file names, `<version>` stands for the version number, for example `0.9.2`.
+Download it from the [latest release](https://github.com/storytold/effectcraft/releases/latest) on GitHub. In the file names, `<version>` stands for the version number, for example `0.9.2`.
 
 ## Windows 11
 
@@ -44,10 +44,6 @@ For RISC-V 64-bit there is a `.deb`, an `.rpm` and a `.tar.gz` (`riscv64` in the
 ## In the browser
 
 `effectcraft-web-<version>.zip` is the web build. It is a static site that runs in a modern browser and needs to be hosted on a web server. Projects, media and settings stay in the browser's private storage and on your computer.
-
-## Install through ArtCraft Launcher
-
-ArtCraft Launcher lists EffectCraft. Click **Install** on its card. See [Install and update Craft apps](https://getartcraft.com/docs/craft-launcher/guides/install-and-update-apps).
 
 ## Check the download
 

@@ -1,13 +1,13 @@
 # User docs: rules for agents and contributors
 
-Everything in this folder (except this file, CLAUDE.md and README.md) is published at
-https://getartcraft.com/docs/effectcraft. The file path is the URL:
+Everything in this folder (except this file, CLAUDE.md and README.md) is published as the
+app's user docs. The file path is the URL:
 `troubleshooting/gpu-not-used.md` → `/docs/effectcraft/troubleshooting/gpu-not-used`.
 Renaming a file breaks links, so add the old path to `redirect_from` when you rename.
 
 ## Who reads this
 
-Artists using EffectCraft, Discord mods answering them, and AI assistants looking things up for
+Artists using EffectCraft, people answering their questions, and AI assistants looking things up for
 either. Write for an artist, not a developer.
 
 ## Page rules
@@ -18,13 +18,13 @@ either. Write for an artist, not a developer.
 - Link to other pages instead of repeating them. Use relative links to the `.md` file:
   `[Install EffectCraft](../getting-started/install.md)`.
 - No marketing copy, no "simply", no claims you have not checked in the code, a release or an issue.
-- Call the product "EffectCraft", as the app, its downloads and getartcraft.com do.
+- Call the product "EffectCraft", as the app and its downloads do.
 - Name UI labels exactly as the app shows them, in **bold**. Menu paths use the menu text from
   `crates/engine/src/menus.rs`.
 - Shortcuts: the code writes `Cmd`, which is Ctrl on Windows and Linux. Write Ctrl for Windows.
 - Windows 11 is the only Windows version to name.
 - Troubleshooting pages: `## Symptoms`, `## Fix`, `## Why this happens` (optional),
-  `## Still stuck?` (link the issue tracker or Discord).
+  `## Still stuck?` (link the issue tracker).
 
 ## Frontmatter
 
@@ -53,9 +53,7 @@ drafts and are not published.
 
 ## Check before you push
 
-    node <path to your artcraft-services checkout>/frontend/apps/artcraft-website-next/scripts/docs/core.mjs docs/user
-
-The checker lives in storytold/artcraft-services. A CI check will be added once it is on that repo's main branch.
+The upstream project checks these pages with the docs checker of its website before publishing them.
 
 ## Support PRs
 

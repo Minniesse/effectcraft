@@ -187,7 +187,7 @@ rustPlatform.buildRustPackage {
       effects and rendering. It ships with effectcraft-cli, a headless renderer, command runner and
       MCP server for AI agents.
     '';
-    homepage = "https://getartcraft.com/apps/effectcraft";
+    homepage = "https://github.com/storytold/effectcraft";
     license = with lib.licenses; [
       mit
       asl20

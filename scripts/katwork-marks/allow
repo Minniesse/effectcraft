@@ -1,1 +1,87 @@
 # Lines that may still name ArtCraft: <path><TAB><the whole line>. Each has its reason in KATWORK.md.
+apps/effectcraft/src/build_flavor.rs	        assert!(result.unwrap_err().contains("ArtCraft Launcher"));
+apps/effectcraft/src/build_flavor.rs	        (BuildFlavor::NightlyV1, false) => Err("Open EffectCraft Nightly from ArtCraft Launcher".into()),
+apps/effectcraft/src/main.rs	    // build is never updated by the stable feed; ArtCraft Launcher replaces it.
+apps/effectcraft/src/profile_root.rs	            let machine = base.join("ArtCraft").join("EffectCraft");
+apps/effectcraft/src/profile_root.rs	        let nightly = data.join("ArtCraftLauncher/nightly/profiles/effectcraft");
+apps/effectcraft/src/profile_root.rs	        let per_user = local.join("Programs").join("ArtCraft").join("EffectCraft");
+apps/effectcraft/src/profile_root.rs	        let sibling = local.join("Programs").join("ArtCraft").join("ArtCraftLauncher").join("nightly").join("effectcraft");
+apps/effectcraft/src/profile_root.rs	        let valid = library.join("Application Support/ArtCraftLauncher/nightly/profiles/effectcraft");
+apps/effectcraft/src/profile_root.rs	                    roots.push(absolute(PathBuf::from(base), key)?.join("ArtCraft").join("EffectCraft"));
+apps/effectcraft/src/profile_root.rs	            roots.push(required_base(env, "LOCALAPPDATA")?.join("Programs").join("ArtCraft").join("EffectCraft"));
+apps/effectcraft-web/web/favicon.svg.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-1024.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft.icns.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft.ico.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-macos-512.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-nightly-1024.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-nightly.icns.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-nightly.ico.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-nightly-macos-512.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-nightly.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft-small.svg.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft.svg.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/effectcraft.svg.attribution	notes:        The owner's ArtCraft drawing of an engraved unicorn bust, vectorised at 2048 px (potrace; three colours). Canonical artwork; the other icon files derive from it.
+assets/app-icon/hicolor/128x128/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/16x16/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/24x24/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/256x256/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/32x32/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/48x48/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/512x512/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/64x64/apps/ai.storyteller.effectcraft.png.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/hicolor/scalable/apps/ai.storyteller.effectcraft.svg.attribution	author:       EffectCraft contributors (drawing by the project owner in ArtCraft)
+assets/app-icon/LICENSE.txt	Original artwork made for this project by the project owner in ArtCraft, then vectorised (no
+assets/app-icon/README.md	**Provenance:** the project owner drew it in ArtCraft (a 2880 px engraving-style image). It was
+assets/app-icon/README.md	**Style:** an ink engraving portrait in the Crafting Apps' owl-template framing (the FilmCraft owl):
+ATTRIBUTION.md	| `assets/app-icon/effectcraft-1024.png` | EffectCraft contributors | Original work: effectCraft app icon, 1024 px (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/effectcraft.icns` | EffectCraft contributors | Original work: effectCraft macOS app icon (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/effectcraft.ico` | EffectCraft contributors | Original work: effectCraft Windows app icon (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/effectcraft-macos-512.png` | EffectCraft contributors | Original work: effectCraft runtime Dock icon (macOS) (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/effectcraft-small.svg` | EffectCraft contributors | Original work: effectCraft app icon, light vector (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/effectcraft.svg` | EffectCraft contributors | Original work: effectCraft app icon, master vector (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/128x128/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 128x128 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/16x16/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 16x16 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/24x24/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 24x24 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/256x256/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 256x256 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/32x32/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 32x32 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/48x48/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 48x48 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/512x512/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 512x512 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/64x64/apps/ai.storyteller.effectcraft.png` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor 64x64 (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+ATTRIBUTION.md	| `assets/app-icon/hicolor/scalable/apps/ai.storyteller.effectcraft.svg` | EffectCraft contributors | Original work: effectCraft app icon, Linux hicolor scalable (owner's ArtCraft unicorn drawing, vectorised) | MIT OR Apache-2.0 (`assets/app-icon/LICENSE.txt`) |
+crates/ui-egui/src/channel.rs	/// automation) may run. A Nightly session is managed by ArtCraft Launcher.
+crates/ui-egui/src/channel.rs	    Some(format!("Nightly channel, managed by ArtCraft Launcher{commit}  •  Report a problem: {}", effectcraft_engine::links::ISSUES))
+crates/ui-egui/src/channel.rs	//! The launch channel: stable EffectCraft, or the isolated Nightly flavor the ArtCraft Launcher
+crates/ui-egui/src/panels/dialogs.rs	pub const BASED_ON: &str = "Based on EffectCraft by the ArtCraft team (https://github.com/storytold/effectcraft). This build is not an ArtCraft product.";
+crates/ui-egui/src/updates_ui.rs	    // A Nightly session is replaced by ArtCraft Launcher, never by the stable release feed: a
+crates/ui-egui/src/updates_ui.rs	        app.ui.status = "Updates come with the ArtCraft Launcher's Nightly channel.".into();
+docs/adr/0001-external-effect-helpers.md	- Later: the ArtCraft launcher can install helpers into `helpers/` the same way it installs
+docs/agents.md	claude mcp add effectcraft -- "$env:LOCALAPPDATA\Programs\ArtCraft\EffectCraft\effectcraft-cli.exe" mcp
+docs/agents.md	| Windows (MSI) | `%LOCALAPPDATA%\Programs\ArtCraft\EffectCraft\effectcraft-cli.exe` by default (`C:\Program Files\ArtCraft\EffectCraft\effectcraft-cli.exe` for an all-users install, under `Program Files (x86)` instead for the 32-bit build, or wherever you installed it otherwise), not on `PATH` |
+docs/releasing.md	an upgrade that keeps it, a repair, uninstall, and the all-users default folder (`Program Files\ArtCraft\EffectCraft`). The wizard pages
+.github/workflows/release.yml	      ARTCRAFT_SERVICES_DISPATCH_TOKEN: ${{ secrets.ARTCRAFT_SERVICES_DISPATCH_TOKEN }}
+.github/workflows/windows-arm64.yml	      install-relative-path: Programs/ArtCraft/EffectCraft
+LICENSE-MIT	Copyright (c) 2026 ArtCraft Team and the EffectCraft contributors
+NOTICE	Copyright (c) 2026 ArtCraft Team and the EffectCraft contributors.
+packaging/linux/flatpak/ai.storyteller.effectcraft.bundle.yml	  - --filesystem=xdg-data/ArtCraft/versions:ro
+packaging/linux/flatpak/ai.storyteller.effectcraft.yml	  - --filesystem=xdg-data/ArtCraft/versions:ro
+packaging/windows/check-install-policy.ps1	      $directories['CraftSuiteFolder'][1] -ne 'ArtCraft') { throw 'Expected the app under the ArtCraft suite folder.' }
+packaging/windows/check-install-policy.ps1	  $machineFolder = (Join-Path $machineRoot "ArtCraft\$($policy.name)") + '\'
+packaging/windows/check-install-policy.ps1	  $userDefault = (Join-Path $env:LOCALAPPDATA "Programs\ArtCraft\$($policy.name)") + '\'
+packaging/windows/check-install-policy.ps1	    $wanted = if ($scope -eq '1') { $machineFolder } else { (Join-Path $env:LOCALAPPDATA "Programs\ArtCraft\$($policy.name)") + '\' }
+packaging/windows/check-install-policy.ps1	    if ($dirs['INSTALLFOLDER'][0] -ne 'CraftSuiteFolder' -or $dirs['CraftSuiteFolder'][1] -ne 'ArtCraft' -or
+packaging/windows/check-install-policy.ps1	      throw 'Launcher new-install folder must be under the per-user ArtCraft suite root.'
+packaging/windows/check-install-policy.ps1	    Write-Output 'PASS ArtCraft Launcher: per-user scope, suite folder, remembered/custom paths and existing registration. No installation performed.'
+packaging/windows/effectcraft.wxs	      <Directory Id="CraftSuiteFolder" Name="ArtCraft">
+packaging/windows/INSTALLATION.md	New installations default to the current account under `Programs\ArtCraft\<App>`.
+packaging/windows/install-policy.wxi	      <Control Id="Info" Type="Text" X="20" Y="50" Width="330" Height="30" Text="{\CraftScopeText}An update keeps the existing folder. New copies use the ArtCraft folder under Programs." />
+packaging/windows/install-policy.wxi	  <SetProperty Id="INSTALLFOLDER" Action="CraftDefaultMachineFolder32" Value="[%ProgramFiles]\ArtCraft\EffectCraft\" After="CraftDefaultMachineFolder" Sequence="ui" Condition="NOT INSTALLFOLDER AND ALLUSERS = 1 AND NOT VersionNT64" />
+packaging/windows/install-policy.wxi	  <SetProperty Id="INSTALLFOLDER" Action="CraftDefaultMachineFolder" Value="[%ProgramFiles(x86)]\ArtCraft\EffectCraft\" After="CraftRestoreUserFolder" Sequence="ui" Condition="NOT INSTALLFOLDER AND ALLUSERS = 1 AND VersionNT64" />
+packaging/windows/install-policy.wxi	  <SetProperty Id="INSTALLFOLDER" Action="CraftDefaultMachineFolder" Value="[%ProgramW6432]\ArtCraft\EffectCraft\" After="CraftRestoreUserFolder" Sequence="ui" Condition="NOT INSTALLFOLDER AND ALLUSERS = 1" />
+packaging/windows/install-policy.wxi	  <SetProperty Id="INSTALLFOLDER" Action="CraftDefaultUserFolder" Value="[LocalAppDataFolder]Programs\ArtCraft\EffectCraft\" After="CraftDefaultMachineFolder32" Sequence="ui" Condition="NOT INSTALLFOLDER AND ALLUSERS &lt;&gt; 1" />
+packaging/windows/install-policy.wxi	  <SetProperty Id="INSTALLFOLDER" Action="CraftDefaultUserFolder" Value="[LocalAppDataFolder]Programs\ArtCraft\EffectCraft\" After="CraftDefaultMachineFolder" Sequence="ui" Condition="NOT INSTALLFOLDER AND ALLUSERS &lt;&gt; 1" />
+packaging/windows/test-msi.ps1	$Default = Join-Path $env:ProgramFiles 'ArtCraft\EffectCraft'
+packaging/windows/test-msi.ps1	    6. installs 0.0.3 with no folder and DESKTOPSHORTCUT=0: it must land in Program Files\ArtCraft\EffectCraft (ALLUSERS=1) with no
+README.md	account only, into `%LOCALAPPDATA%\Programs\ArtCraft\EffectCraft`, without an administrator prompt;
+README.md	Copyright (c) 2026 ArtCraft Team and the EffectCraft contributors. Required notices are in [NOTICE](NOTICE).
+README.md	"Everyone on this computer" installs into `C:\Program Files\ArtCraft\EffectCraft` (`Program Files (x86)` for the 32-bit build). Later versions
