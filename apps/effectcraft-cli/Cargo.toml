@@ -11,8 +11,9 @@ workspace = true
 # Every feature is on by default (the upstream build); the KatWork build turns them off with
 # `--no-default-features`.
 [features]
-default = ["model-download"]
+default = ["model-download", "plugins"]
 model-download = ["effectcraft-host/model-download"]
+plugins = ["effectcraft-host/plugins"]
 
 [[bin]]
 name = "effectcraft-cli"

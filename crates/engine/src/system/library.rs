@@ -466,60 +466,70 @@ fn fetch(src: &Source, max: u64, tmp_dir: &Path) -> std::result::Result<Vec<u8>,
             }
             std::fs::read(p).map_err(|e| format!("cannot read {}: {e}", p.display()))
         }
-        Source::Https(url) => {
-            std::fs::create_dir_all(tmp_dir).map_err(|e| format!("cannot create {}: {e}", tmp_dir.display()))?;
-            // Unique per download: sessions in one process may download at the same time.
-            static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-            let n = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-            let tmp = tmp_dir.join(format!(".download-{}-{n}.part", std::process::id()));
-            // `-q` first: no ~/.curlrc; `--globoff`: `[]` and `{}` in a URL are literal.
-            let out = std::process::Command::new("curl")
-                .args([
-                    "-q",
-                    "--globoff",
-                    "-fsSL",
-                    "--proto",
-                    "=https",
-                    "--proto-redir",
-                    "=https",
-                    "--max-redirs",
-                    "5",
-                    "-w",
-                    "%{url_effective}",
-                    "--retry",
-                    "2",
-                    "--connect-timeout",
-                    "20",
-                    "--max-time",
-                    "900",
-                ])
-                .args(["--max-filesize", &max.to_string(), "-o"])
-                .arg(&tmp)
-                .arg(url)
-                .output()
-                .map_err(|e| format!("downloading needs curl ({e})"))?;
-            // The size is checked before reading: `--max-filesize` can't stop a stream of unknown length.
-            let too_big = std::fs::metadata(&tmp).is_ok_and(|m| m.len() > max);
-            let bytes = if too_big {
-                Err(format!("the download is larger than {} MB", max >> 20))
-            } else if out.status.success() {
-                // Redirects are followed, so check where the download ended up.
-                let end = String::from_utf8_lossy(&out.stdout).trim().to_string();
-                match source(&end, None) {
-                    Ok(Source::Https(_)) => std::fs::read(&tmp).map_err(|e| format!("cannot read the download: {e}")),
-                    _ => Err(format!("`{url}` redirected to `{end}`, which isn't on GitHub")),
-                }
-            } else {
-                Err(format!("download failed: {}", String::from_utf8_lossy(&out.stderr).trim()))
-            };
-            let _ = std::fs::remove_file(&tmp);
-            let bytes = bytes?;
-            if bytes.len() as u64 > max {
-                return Err(format!("the download is larger than {} MB", max >> 20));
-            }
-            Ok(bytes)
-        }
+        Source::Https(url) => fetch_https(url, max, tmp_dir),
     }
+}
+
+/// Download `url` (an https:// URL on GitHub, see [`source`]) with the system curl, at most `max`
+/// bytes, through a temporary file in `tmp_dir`. Builds without the `plugins` feature refuse.
+#[cfg(feature = "plugins")]
+fn fetch_https(url: &str, max: u64, tmp_dir: &Path) -> std::result::Result<Vec<u8>, String> {
+    std::fs::create_dir_all(tmp_dir).map_err(|e| format!("cannot create {}: {e}", tmp_dir.display()))?;
+    // Unique per download: sessions in one process may download at the same time.
+    static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let n = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let tmp = tmp_dir.join(format!(".download-{}-{n}.part", std::process::id()));
+    // `-q` first: no ~/.curlrc; `--globoff`: `[]` and `{}` in a URL are literal.
+    let out = std::process::Command::new("curl")
+        .args([
+            "-q",
+            "--globoff",
+            "-fsSL",
+            "--proto",
+            "=https",
+            "--proto-redir",
+            "=https",
+            "--max-redirs",
+            "5",
+            "-w",
+            "%{url_effective}",
+            "--retry",
+            "2",
+            "--connect-timeout",
+            "20",
+            "--max-time",
+            "900",
+        ])
+        .args(["--max-filesize", &max.to_string(), "-o"])
+        .arg(&tmp)
+        .arg(url)
+        .output()
+        .map_err(|e| format!("downloading needs curl ({e})"))?;
+    // The size is checked before reading: `--max-filesize` can't stop a stream of unknown length.
+    let too_big = std::fs::metadata(&tmp).is_ok_and(|m| m.len() > max);
+    let bytes = if too_big {
+        Err(format!("the download is larger than {} MB", max >> 20))
+    } else if out.status.success() {
+        // Redirects are followed, so check where the download ended up.
+        let end = String::from_utf8_lossy(&out.stdout).trim().to_string();
+        match source(&end, None) {
+            Ok(Source::Https(_)) => std::fs::read(&tmp).map_err(|e| format!("cannot read the download: {e}")),
+            _ => Err(format!("`{url}` redirected to `{end}`, which isn't on GitHub")),
+        }
+    } else {
+        Err(format!("download failed: {}", String::from_utf8_lossy(&out.stderr).trim()))
+    };
+    let _ = std::fs::remove_file(&tmp);
+    let bytes = bytes?;
+    if bytes.len() as u64 > max {
+        return Err(format!("the download is larger than {} MB", max >> 20));
+    }
+    Ok(bytes)
+}
+
+#[cfg(not(feature = "plugins"))]
+fn fetch_https(_url: &str, _max: u64, _tmp_dir: &Path) -> std::result::Result<Vec<u8>, String> {
+    Err("downloading plug-ins is not available in this build".into())
 }
 
 // ---------------------------------------------------------------- installed packages

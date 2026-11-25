@@ -107,8 +107,10 @@ pub fn session() -> Session {
         importer: Some(Arc::new(MediaImporter)),
         expr: Some(Arc::new(effectcraft_expr::Expressions)),
         expr_check: Some(effectcraft_expr::check_syntax),
+        #[cfg(feature = "plugins")]
         plugin_loader: effectcraft_plugin::wasm_available().then_some(effectcraft_plugin::loader as effectcraft_engine::PluginLoader),
         helpers: helper_hooks(),
+        #[cfg(feature = "plugins")]
         plugin_previewer: effectcraft_plugin::wasm_available().then_some(effectcraft_plugin::preview as effectcraft_engine::PluginPreviewer),
         plugins_dir: config_dir().map(|d| d.join("Plug-ins")),
         ..Default::default()
@@ -142,8 +144,8 @@ fn installed_memory_budget() -> Option<usize> {
     Some(effectcraft_engine::prefs::Prefs::default().memory_budget(Some(memory), false).bytes)
 }
 
-/// External effect helpers run as child processes: native builds only.
-#[cfg(not(target_arch = "wasm32"))]
+/// External effect helpers run as child processes: native builds with `plugins` only.
+#[cfg(all(not(target_arch = "wasm32"), feature = "plugins"))]
 fn helper_hooks() -> Option<effectcraft_engine::HelperHooks> {
     use effectcraft_helper_host as hh;
     // Effects that keep stopping their helper are remembered in the settings folder.
@@ -156,14 +158,14 @@ fn helper_hooks() -> Option<effectcraft_engine::HelperHooks> {
     Some(effectcraft_engine::HelperHooks { scan, load: hh::load_path, list: hh::list })
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(any(target_arch = "wasm32", not(feature = "plugins")))]
 fn helper_hooks() -> Option<effectcraft_engine::HelperHooks> {
     None
 }
 
 /// Stop the external effect helpers (when the app quits).
 pub fn stop_helpers() {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "plugins"))]
     effectcraft_helper_host::stop_all();
 }
 
