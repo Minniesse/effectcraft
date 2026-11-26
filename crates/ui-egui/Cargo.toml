@@ -48,7 +48,9 @@ pollster = { workspace = true }
 sys-locale = { workspace = true }
 
 [features]
-default = ["self-update"]
+default = ["self-update", "scripting"]
+# The Script Console panel (the ExtendScript runner is in effectcraft-host's `scripting`).
+scripting = []
 # Help ▸ Check for Updates, the check at start and Restart to Update on native builds (craft-update:
 # a GitHub release client). Without it Check for Updates says it is not available in this build.
 self-update = ["dep:craft-update"]

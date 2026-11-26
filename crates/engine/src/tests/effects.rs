@@ -1474,6 +1474,7 @@ fn copied_effect_property_pastes_onto_the_same_effect() {
 /// Effect helpers run native code: a script starts them only with Allow Scripts to Write Files
 /// and Access Network on (as for File.execute()); the user always can.
 #[test]
+#[cfg(feature = "plugins")]
 fn scripts_start_effect_helpers_only_with_file_access() {
     let mut s = Session {
         helpers: Some(crate::HelperHooks {

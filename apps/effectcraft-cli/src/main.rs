@@ -332,7 +332,7 @@ fn main() {
         return;
     }
     if raw.is_empty() || raw.iter().any(|a| a == "-h" || a == "--help") {
-        say!("{USAGE}");
+        say!("{}", usage());
         std::process::exit(if raw.is_empty() { 2 } else { 0 });
     }
     let mut args = match Args::parse(raw) {
@@ -358,8 +358,28 @@ fn main() {
     }
 }
 
+/// The usage text of this build: without `scripting` it has no `script` subcommand.
+fn usage() -> String {
+    if cfg!(feature = "scripting") {
+        return USAGE.to_string();
+    }
+    let mut out = Vec::new();
+    let mut lines = USAGE.lines().peekable();
+    while let Some(l) = lines.next() {
+        if l.starts_with("  script ") {
+            // The entry and its continuation lines (indented past the subcommand column).
+            while lines.peek().is_some_and(|n| n.starts_with("          ")) {
+                lines.next();
+            }
+            continue;
+        }
+        out.push(l);
+    }
+    out.join("\n").replace("|script|", "|")
+}
+
 fn fail_usage(e: &str) -> ! {
-    note!("effectcraft-cli: {e}\n{USAGE}");
+    note!("effectcraft-cli: {e}\n{}", usage());
     std::process::exit(2)
 }
 
@@ -682,7 +702,7 @@ fn run(cmd: &str, args: &Args, json_out: bool) -> Result<(), Failure> {
         }
         "commands" => list_commands_cmd(args, json_out)?,
         "exec" if args.flag("--list") => list_commands_cmd(args, json_out)?,
-        "script" => script_cmd(args, json_out)?,
+        "script" if cfg!(feature = "scripting") => script_cmd(args, json_out)?,
         "replay" => replay_cmd(args, json_out)?,
         "exec" => {
             let Some(id) = args.pos.first().cloned() else { return usage_err("exec needs a command id") };

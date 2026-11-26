@@ -15,7 +15,7 @@ workspace = true
 default = ["model-download", "plugins", "scripting"]
 model-download = ["effectcraft-host/model-download"]
 plugins = ["effectcraft-host/plugins"]
-scripting = ["effectcraft-host/scripting"]
+scripting = ["effectcraft-host/scripting", "effectcraft-ui-egui/scripting"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]

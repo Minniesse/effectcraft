@@ -7,12 +7,18 @@ effectcraft-cli native - effectcraft-helper-host present
 effectcraft-web wasm32 - effectcraft-plugin present
 effectcraft-web wasm32 - wasmi absent
 effectcraft-web wasm32 - effectcraft-helper-host absent
-# plugins: the Plug-in Library's https downloads (a feature of the engine, no crate)
+# plugins: the plug-in, helper and Plug-in Library commands and menu items, and the Library's
+# https downloads (a feature of the engine, no crate)
 effectcraft-cli native - effectcraft-engine/plugins present
 effectcraft-web wasm32 - effectcraft-engine/plugins present
 # scripting: the ExtendScript runner (document expressions, effectcraft-expr, stay)
 effectcraft-cli native - effectcraft-script present
 effectcraft-web wasm32 - effectcraft-script present
+# scripting: the script commands and menu items (engine) and the Script Console (UI)
+effectcraft-cli native - effectcraft-engine/scripting present
+effectcraft-web wasm32 - effectcraft-engine/scripting present
+effectcraft-cli native - effectcraft-ui-egui/scripting present
+effectcraft-web wasm32 - effectcraft-ui-egui/scripting present
 # model-download: the curl model downloads (a feature of the engine, no crate)
 effectcraft-cli native - effectcraft-engine/model-download present
 effectcraft-web wasm32 - effectcraft-engine/model-download present

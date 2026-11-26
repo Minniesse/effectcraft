@@ -560,6 +560,46 @@ fn mcp_over_stdio() {
     assert_eq!(replies[3]["result"]["content"][0]["type"], "image");
 }
 
+/// A build without `scripting` has no `script` subcommand, and its usage text does not offer one.
+#[test]
+#[cfg(not(feature = "scripting"))]
+fn the_script_subcommand_is_unknown_without_scripting() {
+    let out = bin().args(["script", "--eval", "1 + 1"]).output().unwrap();
+    assert_eq!(out.status.code(), Some(2), "a usage error");
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(err.contains("unknown subcommand `script`"), "{err}");
+    let help = String::from_utf8_lossy(&bin().arg("--help").output().unwrap().stdout).to_string();
+    assert!(help.contains("replay SCRIPT.jsonl") && help.contains("mcp"), "{help}");
+    assert!(!help.contains("|script|") && !help.contains("  script FILE.jsx"), "{help}");
+}
+
+/// A build without `scripting` (the KatWork build) offers no script tools over MCP and no script
+/// subcommand result: the tools are not listed and calling one is refused.
+#[test]
+#[cfg(not(feature = "scripting"))]
+fn mcp_has_no_script_tools_without_scripting() {
+    let mut child = bin().args(["mcp", "--demo"]).stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null()).spawn().unwrap();
+    let msgs = [
+        json!({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "test", "version": "0"}}}),
+        json!({"jsonrpc": "2.0", "method": "notifications/initialized"}),
+        json!({"jsonrpc": "2.0", "id": 2, "method": "tools/list"}),
+        json!({"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "run_script", "arguments": {"code": "1 + 1"}}}),
+    ];
+    {
+        let mut stdin = child.stdin.take().unwrap();
+        for m in &msgs {
+            writeln!(stdin, "{m}").unwrap();
+        }
+    }
+    let out = child.wait_with_output().unwrap();
+    let replies: Vec<Value> = String::from_utf8(out.stdout).unwrap().lines().map(|l| serde_json::from_str(l).unwrap()).collect();
+    let tools: Vec<&str> = replies[1]["result"]["tools"].as_array().unwrap().iter().filter_map(|t| t["name"].as_str()).collect();
+    assert!(tools.contains(&"get_project"), "{tools:?}");
+    assert!(!tools.contains(&"run_script") && !tools.contains(&"script_ui"), "{tools:?}");
+    let call = &replies[2];
+    assert!(call.get("error").is_some() || call["result"]["isError"] == true, "{call}");
+}
+
 #[test]
 #[cfg(feature = "scripting")]
 fn script_file_and_eval() {

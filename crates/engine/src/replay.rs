@@ -704,6 +704,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "scripting")]
     fn commands_run_by_a_journaled_command_are_not_journaled_twice() {
         let mut s = Session::new();
         s.execute("comp.new", json!({})).unwrap();

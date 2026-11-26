@@ -878,6 +878,7 @@ fn consolidate_duplicate_footage() {
 }
 
 #[test]
+#[cfg(feature = "scripting")]
 fn run_script_steps() {
     let mut s = comp();
     let path = tmp("script.jsonl");

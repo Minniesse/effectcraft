@@ -19,6 +19,7 @@ Based on EffectCraft by the ArtCraft team (https://github.com/storytold/effectcr
 | `feat(katwork): plugins feature, on by default` | draft, not opened (in the fork PR body) |
 | `feat(katwork): scripting feature, on by default` | draft, not opened (in the fork PR body) |
 | `feat(katwork): self-update feature, on by default` | draft, not opened (in the fork PR body) |
+| `feat(katwork): hide the UI of compiled-out features` | draft, not opened (part of the plugins and scripting drafts) |
 
 ## The KatWork build
 
@@ -29,18 +30,27 @@ KatWork builds the CLI (`effectcraft-cli`) and the web build (`apps/effectcraft-
   Off: both commands are unknown; Install from File stays, and Settings shows no Download button.
 - `plugins` (in `effectcraft-host`, forwarding the engine's `plugins`): the WebAssembly effect plug-in runtime
   (`effectcraft-plugin`, wasmi), the external effect helpers (`effectcraft-helper-host`, which start helper programs as child
-  processes) and the Plug-in Library's https downloads. Off: the session has no plug-in loader and no helpers, so
-  `effect.plugins.load`, `library.*` installs and `effect.helpers.*` answer that they are not available in this build (the
-  engine's existing answer); a project that uses a plug-in effect opens and renders without it.
-- `scripting` (in `effectcraft-host`; R44): the ExtendScript runner `effectcraft-script` (`script.run`, File ▸ Scripts, the MCP
-  `run_script` tool, the Script Console). Off: they answer "JavaScript scripting is not available in this build" (the engine's
-  existing answer). Document expressions (`effectcraft-expr`, boa) stay: they are document data, evaluated with their own
-  limits, and have no file or socket access.
+  processes) and the Plug-in Library (its https downloads run the system `curl`). Off: `effect.plugins.load` and `.install`,
+  `effect.helpers.*` and every `library.*` command are unknown; Effect ▸ Load/Install Effect Plug-in, the helper items and
+  Plug-in Library are not in the menus and Settings has no Plug-in Library page; a project that uses a plug-in effect opens
+  and renders without it. `effect.plugins.list` stays (it lists the built-in and Rust effect plug-ins, and reports no
+  WebAssembly runtime and no helpers).
+- `scripting` (in `effectcraft-host`, forwarding the engine's and the UI's `scripting`; R44): the ExtendScript runner
+  `effectcraft-script`. Off: every script command is unknown (`script.run`, `file.runScript`, `file.scripts.list`, installing
+  and removing scripts and ScriptUI panels, the startup and shutdown scripts, `script.settings.save`, `script.runTasks`,
+  `scriptui.*`); File ▸ Scripts, Window ▸ Script Console, the ScriptUI panel list and Help ▸ Scripting Help are not in the
+  menus; the Script Console panel cannot be opened; the MCP server lists no `run_script` or `script_ui` tool; the CLI has no
+  `script` subcommand. Document expressions (`effectcraft-expr`, boa) stay, and with them the Settings page "Scripting &
+  Expressions" (its script options then do nothing).
 - `self-update` (in `effectcraft-ui-egui`): the release checker and self-updater `craft-update` and its HTTPS client (`ureq`,
-  `rustls`), which the CLI links through the UI crate (the `bench` UI operations). Off: Check for Updates says it is not
-  available in this build.
+  `rustls`), which the CLI links through the UI crate (the `bench` UI operations). Off: none of it is linked. This version
+  has no Check for Updates menu item or command (`app.checkForUpdates` is already an unknown command upstream), so nothing
+  else needed hiding; the update prompt and the check at start are compiled out with the updater.
 
-`scripts/katwork-profile.sh` (CI job `katwork-profile`) checks that these crates and engine features are not in the KatWork
+No command of a compiled-out feature answers "not available in this build" any more: each is unknown. The engine's existing
+"not available" answers stay in the code for sessions built without a host (the engine's own tests).
+
+`scripts/katwork-profile.sh` (CI job `katwork-profile`) checks that these crates and features are not in the KatWork
 build graphs, with a control that each is in the upstream build, and runs `crates/host/tests/katwork_profile.rs` with the
 features off.
 

@@ -146,7 +146,15 @@ impl PanelKind {
     }
     pub fn from_name(s: &str) -> Option<PanelKind> {
         let n = s.to_ascii_lowercase().replace([' ', '_', '-', '&'], "");
-        Self::ALL.iter().copied().find(|p| format!("{p:?}").to_ascii_lowercase() == n || p.title().to_ascii_lowercase().replace([' ', '&', '-'], "") == n)
+        Self::ALL
+            .iter()
+            .copied()
+            .filter(|p| p.in_this_build())
+            .find(|p| format!("{p:?}").to_ascii_lowercase() == n || p.title().to_ascii_lowercase().replace([' ', '&', '-'], "") == n)
+    }
+    /// Whether this build has the panel: the Script Console needs the `scripting` feature.
+    pub fn in_this_build(self) -> bool {
+        cfg!(feature = "scripting") || self != PanelKind::ScriptConsole
     }
     /// Window-menu shortcut.
     pub fn window_shortcut(self) -> Option<&'static str> {

@@ -618,13 +618,30 @@ fn an_element_that_moves_while_the_ui_settles_is_captured_where_it_is() {
     assert_eq!((value["result"]["width"].as_u64(), value["result"]["height"].as_u64()), (Some(300), Some(200)), "{value}");
 }
 
-/// A native build without `self-update` (the KatWork build) links no updater: Help ▸ Check for
-/// Updates says so instead of checking.
+/// A native build without `self-update` (the KatWork build) links no updater: Check for Updates is
+/// an unknown command, and nothing opens.
 #[test]
 #[cfg(all(not(target_arch = "wasm32"), not(feature = "self-update")))]
-fn check_for_updates_without_self_update_says_it_is_not_available() {
+fn check_for_updates_is_unknown_without_self_update() {
     let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
-    updates_ui::check(&mut app);
-    assert!(app.updates_rt.manual_window_open);
-    assert_eq!(app.updates_rt.status_message.as_deref(), Some("Update check is not available in this build."));
+    let ctx = egui::Context::default();
+    for id in ["app.checkForUpdates", "help.checkForUpdates"] {
+        let e = crate::menus::invoke(&mut app, &ctx, id, json!({})).expect_err(id);
+        assert!(e.to_lowercase().contains("unknown"), "{id}: {e}");
+        assert!(!app.updates_rt.manual_window_open, "{id}");
+    }
+}
+
+/// A build without `scripting` has no Script Console: Window ▸ Script Console is gone (the engine
+/// hides it) and the panel cannot be opened by name.
+#[test]
+#[cfg(not(feature = "scripting"))]
+fn the_script_console_is_unknown_without_scripting() {
+    let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+    let ctx = egui::Context::default();
+    for name in ["scriptConsole", "Script Console"] {
+        let e = crate::menus::invoke(&mut app, &ctx, "window.panel", json!({"panel": name})).expect_err(name);
+        assert!(e.contains("unknown panel"), "{name}: {e}");
+    }
+    assert!(crate::dock::PanelKind::from_name("timeline").is_some(), "other panels open");
 }

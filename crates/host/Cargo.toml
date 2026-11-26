@@ -15,7 +15,7 @@ default = ["plugins", "scripting", "model-download"]
 # processes): `effect.plugins.load`, the Plug-in Library, `effect.helpers.*`.
 plugins = ["dep:effectcraft-plugin", "dep:effectcraft-helper-host", "effectcraft-engine/plugins"]
 # The JavaScript script runner: `script.run`, File ▸ Scripts, the Script Console.
-scripting = ["dep:effectcraft-script"]
+scripting = ["dep:effectcraft-script", "effectcraft-engine/scripting"]
 # Model weight downloads (`roto.model.download`, `face.model.download`).
 model-download = ["effectcraft-engine/model-download"]
 

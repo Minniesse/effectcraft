@@ -95,12 +95,23 @@ pub fn catalogue() -> &'static [ToolDef] {
 }
 
 pub fn find(name: &str) -> Option<&'static ToolDef> {
-    TOOLS.iter().find(|t| t.name == name)
+    TOOLS.iter().filter(|t| in_this_build(t)).find(|t| t.name == name)
 }
 
 /// The tools available on a backend (bridge-only tools are hidden in headless mode).
 pub fn available(bridge: bool) -> impl Iterator<Item = &'static ToolDef> {
-    TOOLS.iter().filter(move |t| bridge || !t.bridge_only)
+    TOOLS.iter().filter(move |t| (bridge || !t.bridge_only) && in_this_build(t))
+}
+
+/// Whether this build has the commands a tool runs: a build without script commands (the
+/// engine's `scripting` feature) has no `run_script` or `script_ui` tool.
+fn in_this_build(t: &ToolDef) -> bool {
+    let needs = match t.name {
+        "run_script" => "script.run",
+        "script_ui" => "scriptui.list",
+        _ => return true,
+    };
+    effectcraft_engine::commands::find(needs).is_some()
 }
 
 /// Tools refused while file access is confined: they drive the live app like a person (menus,

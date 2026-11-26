@@ -382,6 +382,7 @@ pub fn pages() -> Vec<Page> {
                 Models(effectcraft_segment::Task::Face),
             ],
         },
+        #[cfg(feature = "plugins")]
         Page {
             id: "library",
             title: "Plug-in Library",

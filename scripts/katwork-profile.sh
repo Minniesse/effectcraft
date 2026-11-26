@@ -8,8 +8,9 @@
 #   normal-dependency graph of <package>. The last column is the control: with the default features (the upstream
 #   build) <crate> must be `present`, which proves the gate defaults on and that <crate> is spelt right; `absent`
 #   marks a row whose crate is not in that graph even upstream (the assertion is then vacuous, and is printed so).
-#   An `absent` control accepts only the "nothing to print" form: it proves <crate> is spelt right (it is in the
-#   workspace's resolve, for another target or edge kind); a misspelt crate gives "did not match" and fails.
+#   An `absent` control proves <crate> is spelt right another way: it must be a package of Cargo.lock (cargo tree
+#   resolves only <package>'s own graph, so a crate the workspace has elsewhere also gives "did not match").
+#   Every row's <package> must be a workspace member: `-p` with a misspelt package gives the same "did not match".
 #
 # A row whose <crate> is `<dep>/<feature>` checks a feature, for a gate that removes no crate (a command that runs
 # a system program, say): with the KatWork features <dep> must be built without <feature>; `present` means the
@@ -41,6 +42,11 @@ absent() {
     { [ "$rc" = 0 ] && grep -q 'nothing to print' <<<"$out"; }
 }
 
+members=$(cargo metadata --locked --no-deps --format-version 1 2>/dev/null |
+  python3 -c 'import json,sys; print("\n".join(p["name"] for p in json.load(sys.stdin)["packages"]))')
+[ -n "$members" ] || { echo "FAIL: cargo metadata listed no workspace package"; exit 1; }
+locked() { grep -qx "name = \"$1\"" Cargo.lock; }
+
 # `|| [ -n "$pkg" ]` keeps a last row that has no final newline.
 while read -r pkg target feats crate control || [ -n "$pkg" ]; do
   case "$pkg" in ''|'#'*) continue ;; esac
@@ -49,6 +55,7 @@ while read -r pkg target feats crate control || [ -n "$pkg" ]; do
     native|wasm32) ;;
     *) echo "FAIL: row $n: target must be native or wasm32, not '$target'"; fail=1; continue ;;
   esac
+  if ! grep -qx -- "$pkg" <<<"$members"; then echo "FAIL: row $n: $pkg is not a package of this workspace"; fail=1; continue; fi
   if [ "$feats" = - ]; then extra=(); else extra=(--features "$feats"); fi
   if [[ "$crate" == */* ]]; then
     dep=${crate%%/*} feat=${crate#*/}
@@ -83,7 +90,7 @@ while read -r pkg target feats crate control || [ -n "$pkg" ]; do
         sed 's/^/  /' <<<"$out" | head -10; fail=1
       fi ;;
     absent)
-      if [ "$rc" = 0 ] && grep -q 'nothing to print' <<<"$out"; then echo "note: $crate is not in $pkg ($target) upstream either; this row is vacuous"
+      if absent && locked "$crate"; then echo "note: $crate is not in $pkg ($target) upstream either; this row is vacuous"
       else echo "FAIL: control: $crate is in $pkg ($target) upstream, or is not in the workspace at all (a typo?), but the row says absent:"; sed 's/^/  /' <<<"$out" | head -10; fail=1; fi ;;
     *) echo "FAIL: row $n: control must be present or absent, not '$control'"; fail=1 ;;
   esac

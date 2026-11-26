@@ -15,7 +15,7 @@ model-download = ["effectcraft-host/model-download"]
 # WebAssembly effect plug-ins, the Plug-in Library and external effect helpers; also the
 # start-up load of <config>/Plug-ins.
 plugins = ["effectcraft-host/plugins"]
-scripting = ["effectcraft-host/scripting"]
+scripting = ["effectcraft-host/scripting", "effectcraft-ui-egui/scripting"]
 # The update check and self-updater (craft-update).
 self-update = ["effectcraft-ui-egui/self-update", "dep:craft-update"]
 
