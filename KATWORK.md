@@ -35,8 +35,9 @@ KatWork builds the CLI (`effectcraft-cli`) and the web build (`apps/effectcraft-
   Plug-in Library are not in the menus and Settings has no Plug-in Library page; a project that uses a plug-in effect opens
   and renders without it. `effect.plugins.list` stays (it lists the built-in and Rust effect plug-ins, and reports no
   WebAssembly runtime and no helpers).
-- `scripting` (in `effectcraft-host`, forwarding the engine's and the UI's `scripting`; R44): the ExtendScript runner
-  `effectcraft-script`. Off: every script command is unknown (`script.run`, `file.runScript`, `file.scripts.list`, installing
+- `scripting` (in `effectcraft-host`, forwarding the engine's and the UI's `scripting`): the ExtendScript runner
+  `effectcraft-script`; the founder decided that scripts do not run in the KatWork build and document expressions stay.
+  Off: every script command is unknown (`script.run`, `file.runScript`, `file.scripts.list`, installing
   and removing scripts and ScriptUI panels, the startup and shutdown scripts, `script.settings.save`, `script.runTasks`,
   `scriptui.*`); File ▸ Scripts, Window ▸ Script Console, the ScriptUI panel list and Help ▸ Scripting Help are not in the
   menus; the Script Console panel cannot be opened; the MCP server lists no `run_script` or `script_ui` tool; the CLI has no

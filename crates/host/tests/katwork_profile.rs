@@ -53,9 +53,9 @@ fn model_download_and_plugins_are_unknown() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
-/// R44: the ExtendScript runner is compiled out, and with it every script command: running code
-/// or script files, installing scripts and ScriptUI panels, the scripts' scheduled tasks and the
-/// ScriptUI windows. (The MCP `run_script` and `script_ui` tools are hidden by the automation
+/// The founder decided that scripts do not run in this build: the ExtendScript runner is compiled
+/// out, and with it every script command: running code or script files, installing scripts and
+/// ScriptUI panels, the scripts' scheduled tasks and the ScriptUI windows. (The MCP `run_script` and `script_ui` tools are hidden by the automation
 /// crate; the Script Console by the UI.)
 #[test]
 fn script_commands_are_unknown() {
@@ -155,7 +155,8 @@ fn menus_and_settings_hide_compiled_out_features() {
     assert!(!pages.contains("\"library\""), "no Plug-in Library page");
 }
 
-/// R44: document expressions stay (they are document data, evaluated by `effectcraft-expr`).
+/// The founder decided that document expressions stay (they are document data, evaluated by
+/// `effectcraft-expr`).
 #[test]
 fn document_expressions_still_evaluate() {
     let (mut s, l) = comp();
