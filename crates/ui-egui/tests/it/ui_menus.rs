@@ -479,3 +479,17 @@ fn pointer_reentering_over_another_title_switches_menus() {
     assert!(shown(&h, "Keyboard Shortcuts"), "coming back over Edit opened it");
     assert!(!shown(&h, "Open Project"), "and closed File");
 }
+
+/// About shows the app's name and the "Based on" line as plain text, and no Discord or website
+/// links (the app name stands where the mark was).
+#[test]
+fn about_names_the_app_and_where_it_comes_from() {
+    let mut h = harness();
+    h.state_mut().dialog = Some(effectcraft_ui_egui::Dialog::About);
+    h.run_steps(3);
+    assert!(shown(&h, effectcraft_ui_egui::panels::dialogs::BASED_ON));
+    assert!(h.state().auto.find("about.help.github").is_some(), "the source link");
+    assert!(h.state().auto.find("about.help.discord").is_none() && h.state().auto.find("about.help.website").is_none());
+    assert!(!shown(&h, "Discord"));
+    assert_eq!(effectcraft_ui_egui::header::brand_label(), "EffectCraft");
+}

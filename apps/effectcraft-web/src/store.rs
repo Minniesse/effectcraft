@@ -568,6 +568,7 @@ mod tests {
 
     /// Scripts in a subfolder of the Scripts folder (`Tools/Hello.jsx`) are listed, as on the desktop.
     #[test]
+    #[cfg(feature = "scripting")]
     fn config_store_lists_folders() {
         let c = WebConfig::new(store());
         for name in ["Scripts/Top.jsx", "Scripts/Tools/Hello.jsx", "Scripts/Tools/More.jsx", "Scripts/ScriptUI Panels/Kit/A.jsx"] {

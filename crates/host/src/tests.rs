@@ -65,6 +65,7 @@ fn memory_sink_cannot_overwrite_a_previous_output_even_with_skip_existing() {
     assert_eq!(writes.load(Ordering::Relaxed), 0, "refused before the sink receives bytes");
 }
 
+#[cfg(feature = "scripting")]
 #[test]
 fn host_runs_tasks_scheduled_by_panel_handlers() {
     let mut s = super::session();
@@ -511,6 +512,7 @@ fn proxies_in_exports_and_create_proxy() {
 }
 
 /// A script builds a comp, queues it and renders it through the Render Queue.
+#[cfg(feature = "scripting")]
 #[test]
 fn script_renders_through_the_render_queue() {
     let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/test-out/host-script");
@@ -540,6 +542,7 @@ fn script_renders_through_the_render_queue() {
 }
 
 /// importFile, layers.add(footage) and project save/open from a script.
+#[cfg(feature = "scripting")]
 #[test]
 fn script_imports_footage_and_saves() {
     let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/test-out/host-script-import");

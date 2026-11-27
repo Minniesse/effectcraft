@@ -15,6 +15,7 @@
 //!   @dynamic:history                          entries computed from the session when the menu
 //!                                             opens ([`dynamic`]: recent files, undo history…)
 //! [mac] Quit EffectCraft | app.quit           only on macOS ([!mac] = everywhere else)
+//! [scripting] / [plugins]: only in builds with that Cargo feature (the line and its subtree)
 //! ```
 //!
 //! An entry's shortcut is the command's default shortcut unless the line gives one (needed for
@@ -445,7 +446,11 @@ pub fn parse(text: &str, mac: bool) -> Result<Vec<MenuNode>, String> {
             *body = rest;
             Some(keep)
         };
-        if let Some(false) = tagged("[mac] ", mac, &mut body).or_else(|| tagged("[!mac] ", !mac, &mut body)) {
+        if let Some(false) = tagged("[mac] ", mac, &mut body)
+            .or_else(|| tagged("[!mac] ", !mac, &mut body))
+            .or_else(|| tagged("[scripting] ", cfg!(feature = "scripting"), &mut body))
+            .or_else(|| tagged("[plugins] ", cfg!(feature = "plugins"), &mut body))
+        {
             skip_below = Some(depth);
             continue;
         }
@@ -620,7 +625,7 @@ File
     Relink Missing Footage... | file.relinkFootage
   Watch Folder... | file.watchFolder
   ---
-  Scripts
+  [scripting] Scripts
     @dynamic:scripts
     ---
     Install Script File... | file.installScript
@@ -628,7 +633,7 @@ File
     Run Script File... | file.runScript
     Recent Script Files
       @dynamic:recentScripts
-  ---
+  [scripting] ---
   Create Proxy
     Still... | file.createProxy {"kind":"still"}
     Movie... | file.createProxy {"kind":"movie"}
@@ -1034,12 +1039,12 @@ Effect
   Remove All | effect.removeAll
   ---
   Manage Effects... | effect.manage
-  Load Effect Plug-in... | effect.plugins.load
-  Install Effect Plug-in... | effect.plugins.install
-  Install Effect Plug-in Bundle (Folder)... | effect.plugins.install {"bundle": true}
-  Load Plug-ins Through Helper... | effect.helpers.load
-  Scan for Effect Helpers | effect.helpers.scan
-  Plug-in Library... | prefs.open {"page":"library"}
+  [plugins] Load Effect Plug-in... | effect.plugins.load
+  [plugins] Install Effect Plug-in... | effect.plugins.install
+  [plugins] Install Effect Plug-in Bundle (Folder)... | effect.plugins.install {"bundle": true}
+  [plugins] Load Plug-ins Through Helper... | effect.helpers.load
+  [plugins] Scan for Effect Helpers | effect.helpers.scan
+  [plugins] Plug-in Library... | prefs.open {"page":"library"}
   ---
   @effects
 Animation
@@ -1281,7 +1286,7 @@ Window
   Preview | window.panel {"panel":"preview"} | Cmd+3
   Progress | window.panel {"panel":"progress"}
   Properties | window.panel {"panel":"properties"}
-  Script Console | window.panel {"panel":"scriptConsole"}
+  [scripting] Script Console | window.panel {"panel":"scriptConsole"}
   Smoother | window.panel {"panel":"smoother"}
   Tools | window.panel {"panel":"tools"} | Cmd+1
   Tracker | window.panel {"panel":"tracker"}
@@ -1299,10 +1304,10 @@ Window
   ---
   Create Nulls From Paths | window.panel {"panel":"createNullsFromPaths"}
   VR Comp Editor | window.panel {"panel":"vrCompEditor"}
-  @dynamic:scriptPanels
+  [scripting] @dynamic:scriptPanels
 Help
   EffectCraft Help... | help.docs {"page":"help"} | F1
-  Scripting Help... | help.docs {"page":"scripting"}
+  [scripting] Scripting Help... | help.docs {"page":"scripting"}
   Expression Reference... | help.docs {"page":"expressions"}
   Effect Reference... | help.docs {"page":"effects"}
   Animation Presets... | anim.browsePresets
@@ -1315,11 +1320,8 @@ Help
   Enable Logging | help.enableLogging
   Reveal Logging File | help.revealLogFile
   ---
-  Join the ArtCraft Discord... | help.discord
   Provide Feedback... | help.reportIssue
   ---
-  ArtCraft Website | help.website
-  EffectCraft Home Page | help.appPage
   EffectCraft on GitHub | help.github
   Open Demo Project | file.openDemoProject
   [!mac] ---

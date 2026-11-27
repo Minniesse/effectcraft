@@ -20,5 +20,6 @@ effectcraft-model = { workspace = true }
 
 [dev-dependencies]
 effectcraft-script = { workspace = true }
-effectcraft-host = { workspace = true }
+# The tests drive a fully wired session, as the apps' default builds have.
+effectcraft-host = { workspace = true, features = ["plugins", "scripting", "model-download"] }
 tempfile = { workspace = true }

@@ -259,8 +259,28 @@ pub fn command_specs() -> &'static [CommandSpec] {
         v.extend(crate::learn::specs());
         v.extend(crate::templates::specs());
         v.extend(crate::preview::specs());
+        // A build without a feature leaves that feature's commands out: they are unknown.
+        v.retain(|c| cfg!(feature = "scripting") || !is_script_command(c.id));
+        v.retain(|c| cfg!(feature = "plugins") || !is_plugin_command(c.id));
         v
     })
+}
+
+/// Commands of the `scripting` feature: running scripts and script files, installing scripts and
+/// ScriptUI panels, the scripts' settings and scheduled tasks, and the ScriptUI windows.
+pub fn is_script_command(id: &str) -> bool {
+    scripts::RUNS_SCRIPTS.contains(&id)
+        || id.starts_with("scriptui.")
+        || matches!(
+            id,
+            "file.scripts.list" | "file.installScript" | "file.installScriptUIPanel" | "file.uninstallScript" | "script.settings.save" | "script.runTasks"
+        )
+}
+
+/// Commands of the `plugins` feature: loading and installing WebAssembly effect plug-ins, the
+/// external effect helpers and the Plug-in Library.
+pub fn is_plugin_command(id: &str) -> bool {
+    matches!(id, "effect.plugins.load" | "effect.plugins.install") || id.starts_with("effect.helpers.") || id.starts_with("library.")
 }
 
 /// Set `footage` as the proxy of `item` (File ▸ Create Proxy's post-render action).

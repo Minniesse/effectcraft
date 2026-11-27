@@ -225,7 +225,7 @@ fn workspace_layout_autosave_writes_on_a_hidden_tick() {
 }
 
 /// Whether a frame running `f` asked the root window to close.
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn asks_to_close(ctx: &egui::Context, mut f: impl FnMut(&egui::Context)) -> bool {
     let mut out = ctx.run_ui(raw(egui::vec2(800.0, 480.0)), |ui| f(ui.ctx()));
     out.textures_delta.clear();
@@ -233,7 +233,7 @@ fn asks_to_close(ctx: &egui::Context, mut f: impl FnMut(&egui::Context)) -> bool
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn restart_to_update_with_unsaved_changes_opens_the_unsaved_changes_prompt() {
     let ctx = egui::Context::default();
     let frame = eframe::Frame::_new_kittest();
@@ -250,7 +250,7 @@ fn restart_to_update_with_unsaved_changes_opens_the_unsaved_changes_prompt() {
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn restart_to_update_with_nothing_unsaved_leaves_the_close_to_the_updater() {
     let ctx = egui::Context::default();
     let mut app = app_with_comp();
@@ -260,7 +260,7 @@ fn restart_to_update_with_nothing_unsaved_leaves_the_close_to_the_updater() {
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn restart_to_update_with_the_startup_prompt_open_leaves_the_window_open() {
     let ctx = egui::Context::default();
     let mut app = app_with_comp();
@@ -294,7 +294,7 @@ fn the_close_guard_answers_a_close_request_without_a_pass() {
 }
 
 #[test]
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "self-update"))]
 fn the_update_result_dialog_shows_every_status_but_idle() {
     use craft_update::updater::Status;
     let shown = [
@@ -616,4 +616,32 @@ fn an_element_that_moves_while_the_ui_settles_is_captured_where_it_is() {
     let value = reply.try_recv().expect("the capture replies");
     assert_eq!(value["ok"], true, "{value}");
     assert_eq!((value["result"]["width"].as_u64(), value["result"]["height"].as_u64()), (Some(300), Some(200)), "{value}");
+}
+
+/// A native build without `self-update` (the KatWork build) links no updater: Check for Updates is
+/// an unknown command, and nothing opens.
+#[test]
+#[cfg(all(not(target_arch = "wasm32"), not(feature = "self-update")))]
+fn check_for_updates_is_unknown_without_self_update() {
+    let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+    let ctx = egui::Context::default();
+    for id in ["app.checkForUpdates", "help.checkForUpdates"] {
+        let e = crate::menus::invoke(&mut app, &ctx, id, json!({})).expect_err(id);
+        assert!(e.to_lowercase().contains("unknown"), "{id}: {e}");
+        assert!(!app.updates_rt.manual_window_open, "{id}");
+    }
+}
+
+/// A build without `scripting` has no Script Console: Window ▸ Script Console is gone (the engine
+/// hides it) and the panel cannot be opened by name.
+#[test]
+#[cfg(not(feature = "scripting"))]
+fn the_script_console_is_unknown_without_scripting() {
+    let mut app = EffectcraftApp::new(effectcraft_engine::Session::default());
+    let ctx = egui::Context::default();
+    for name in ["scriptConsole", "Script Console"] {
+        let e = crate::menus::invoke(&mut app, &ctx, "window.panel", json!({"panel": name})).expect_err(name);
+        assert!(e.contains("unknown panel"), "{name}: {e}");
+    }
+    assert!(crate::dock::PanelKind::from_name("timeline").is_some(), "other panels open");
 }

@@ -623,6 +623,7 @@ pub fn specs() -> Vec<CommandSpec> {
 }
 
 #[cfg(test)]
+#[cfg(feature = "scripting")]
 mod tests {
     use std::path::PathBuf;
     use std::sync::Arc;

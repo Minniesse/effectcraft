@@ -392,63 +392,43 @@ fn about(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens) {
     }
 }
 
-/// The About tab: logo, version, blurb and community links.
+/// The "Based on" line the About tab shows (this build is a modified version of the upstream app).
+pub const BASED_ON: &str = "Based on EffectCraft by the ArtCraft team (https://github.com/storytold/effectcraft). This build is not an ArtCraft product.";
+
+/// The About tab: the app's name, version, blurb, the "Based on" line and the source link.
 fn about_main(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, cmd: &mut Option<&'static str>) {
     let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 96.0), Sense::hover());
     let p = ui.painter();
     p.rect_filled(r, 10.0, Color32::from_rgb(0x1b, 0x22, 0x3c));
-    crate::header::paint_logo(p, Rect::from_min_size(r.min + vec2(18.0, 20.0), vec2(56.0, 56.0)));
     let channel = crate::channel::identity();
-    p.text(r.min + vec2(90.0, 34.0), Align2::LEFT_CENTER, crate::channel::name_for(channel), Tokens::semibold(24.0), Color32::WHITE);
+    p.text(r.min + vec2(18.0, 34.0), Align2::LEFT_CENTER, crate::channel::name_for(channel), Tokens::semibold(24.0), Color32::WHITE);
     // A Nightly build reports its prepared feed version and channel; stable keeps its Cargo version.
     let version = match crate::channel::channel_label() {
         Some(label) => format!("Version {} ({label})  •  Motion graphics & VFX in pure Rust", crate::channel::version()),
         None => format!("Version {}  •  Motion graphics & VFX in pure Rust", crate::channel::version()),
     };
-    p.text(r.min + vec2(90.0, 62.0), Align2::LEFT_CENTER, version, Tokens::ui(12.0), t.text_dim);
+    p.text(r.min + vec2(18.0, 62.0), Align2::LEFT_CENTER, version, Tokens::ui(12.0), t.text_dim);
     if let Some(line) = crate::channel::nightly_about_line() {
-        p.text(r.min + vec2(90.0, 80.0), Align2::LEFT_CENTER, line, Tokens::ui(11.0), t.text_faint);
+        p.text(r.min + vec2(18.0, 80.0), Align2::LEFT_CENTER, line, Tokens::ui(11.0), t.text_faint);
     }
     ui.add_space(12.0);
-    ui.label(tr("A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser. Part of the ArtCraft family of creative apps."));
+    ui.label(tr("A clean-room, open-source compositor for motion graphics and visual effects: native on macOS, Windows and Linux, and in the browser."));
+    ui.add_space(8.0);
+    let based_on = ui.label(BASED_ON);
+    app.auto.add("about.basedOn", based_on.rect, BASED_ON);
     ui.add_space(14.0);
-    let links: [(Icon, &str, &str, &'static str); 4] = [
-        (Icon::Chat, "Join the ArtCraft Discord", effectcraft_engine::links::DISCORD, "help.discord"),
-        (Icon::Globe, "ArtCraft website", effectcraft_engine::links::WEBSITE, "help.website"),
-        (Icon::Sparkle, "EffectCraft home page", effectcraft_engine::links::APP_PAGE, "help.appPage"),
-        (Icon::Code, "Source code on GitHub", effectcraft_engine::links::GITHUB, "help.github"),
-    ];
-    for (icon, label, url, c) in links {
-        let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 30.0), Sense::click());
-        let p = ui.painter();
-        let discord = c == "help.discord";
-        p.rect_filled(
-            r,
-            6.0,
-            if discord {
-                Color32::from_rgb(0x58, 0x65, 0xf2)
-            } else if resp.hovered() {
-                t.hover
-            } else {
-                t.field_bg
-            },
-        );
-        let foreground = if discord { Color32::WHITE } else { t.text };
-        icons::paint(p, Rect::from_center_size(pos2(r.min.x + 18.0, r.center().y), vec2(15.0, 15.0)), icon, foreground);
-        p.text(pos2(r.min.x + 36.0, r.center().y), Align2::LEFT_CENTER, tr(label), Tokens::medium(12.5), foreground);
-        p.text(
-            pos2(r.max.x - 12.0, r.center().y),
-            Align2::RIGHT_CENTER,
-            url,
-            Tokens::ui(11.0),
-            if discord { Color32::from_white_alpha(200) } else { t.text_dim },
-        );
-        app.auto.add(&format!("about.{c}"), r, label);
-        if resp.clicked() {
-            *cmd = Some(c);
-        }
-        ui.add_space(4.0);
+    let (icon, label, url, c) = (Icon::Code, "Source code on GitHub", effectcraft_engine::links::GITHUB, "help.github");
+    let (r, resp) = ui.allocate_exact_size(vec2(ui.available_width(), 30.0), Sense::click());
+    let p = ui.painter();
+    p.rect_filled(r, 6.0, if resp.hovered() { t.hover } else { t.field_bg });
+    icons::paint(p, Rect::from_center_size(pos2(r.min.x + 18.0, r.center().y), vec2(15.0, 15.0)), icon, t.text);
+    p.text(pos2(r.min.x + 36.0, r.center().y), Align2::LEFT_CENTER, tr(label), Tokens::medium(12.5), t.text);
+    p.text(pos2(r.max.x - 12.0, r.center().y), Align2::RIGHT_CENTER, url, Tokens::ui(11.0), t.text_dim);
+    app.auto.add(&format!("about.{c}"), r, label);
+    if resp.clicked() {
+        *cmd = Some(c);
     }
+    ui.add_space(4.0);
 }
 
 fn comp_settings(app: &mut EffectcraftApp, ctx: &egui::Context, t: &Tokens, existing: bool) {

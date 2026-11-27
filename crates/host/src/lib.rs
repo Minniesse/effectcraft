@@ -2,6 +2,13 @@
 //! the media importer, the expression engine, JavaScript scripting (`effectcraft-script`) and
 //! Render Queue export through `effectcraft-export` (craft-libs' encoders). Frontends (desktop,
 //! CLI, MCP, web) start here.
+//!
+//! Features (all default on): `plugins` links the WebAssembly effect plug-in runtime
+//! (`effectcraft-plugin`) and the external effect helpers (`effectcraft-helper-host`, child
+//! processes); `scripting` links the JavaScript script runner (`effectcraft-script`);
+//! `model-download` keeps the engine's model downloads. Without them the session answers that
+//! plug-ins and scripts are not available in this build, and the download commands are unknown.
+//! Document expressions (`effectcraft-expr`) are always linked.
 
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
@@ -10,6 +17,7 @@ use std::sync::Arc;
 use effectcraft_engine::project::render_queue::OutputFormat;
 use effectcraft_engine::{ExportJob, ExportResult, Exporter, Importer, Session};
 use effectcraft_project::Footage;
+#[cfg(feature = "scripting")]
 pub use effectcraft_script as script;
 
 pub mod app_dirs;
@@ -107,12 +115,15 @@ pub fn session() -> Session {
         importer: Some(Arc::new(MediaImporter)),
         expr: Some(Arc::new(effectcraft_expr::Expressions)),
         expr_check: Some(effectcraft_expr::check_syntax),
+        #[cfg(feature = "plugins")]
         plugin_loader: effectcraft_plugin::wasm_available().then_some(effectcraft_plugin::loader as effectcraft_engine::PluginLoader),
         helpers: helper_hooks(),
+        #[cfg(feature = "plugins")]
         plugin_previewer: effectcraft_plugin::wasm_available().then_some(effectcraft_plugin::preview as effectcraft_engine::PluginPreviewer),
         plugins_dir: config_dir().map(|d| d.join("Plug-ins")),
         ..Default::default()
     };
+    #[cfg(feature = "scripting")]
     effectcraft_script::install(&mut s);
     // The caches' common budget from the start (#3298): the CLI and the MCP server never load
     // the settings, and the caches have no limits of their own below it. Without a memory
@@ -142,8 +153,8 @@ fn installed_memory_budget() -> Option<usize> {
     Some(effectcraft_engine::prefs::Prefs::default().memory_budget(Some(memory), false).bytes)
 }
 
-/// External effect helpers run as child processes: native builds only.
-#[cfg(not(target_arch = "wasm32"))]
+/// External effect helpers run as child processes: native builds with `plugins` only.
+#[cfg(all(not(target_arch = "wasm32"), feature = "plugins"))]
 fn helper_hooks() -> Option<effectcraft_engine::HelperHooks> {
     use effectcraft_helper_host as hh;
     // Effects that keep stopping their helper are remembered in the settings folder.
@@ -156,14 +167,14 @@ fn helper_hooks() -> Option<effectcraft_engine::HelperHooks> {
     Some(effectcraft_engine::HelperHooks { scan, load: hh::load_path, list: hh::list })
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(any(target_arch = "wasm32", not(feature = "plugins")))]
 fn helper_hooks() -> Option<effectcraft_engine::HelperHooks> {
     None
 }
 
 /// Stop the external effect helpers (when the app quits).
 pub fn stop_helpers() {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "plugins"))]
     effectcraft_helper_host::stop_all();
 }
 

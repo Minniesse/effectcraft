@@ -6,9 +6,11 @@ mod determinism;
 mod exr_layers;
 mod footage_reload;
 mod gif_animates;
+#[cfg(feature = "plugins")]
 mod library;
 mod memory_budget;
 mod pick_whip;
+#[cfg(feature = "plugins")]
 mod plugins;
 mod relink;
 mod tga_import;

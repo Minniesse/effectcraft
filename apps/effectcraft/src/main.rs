@@ -335,7 +335,7 @@ fn main() -> eframe::Result {
 fn run_desktop(reporter: &crash_report::Shutdown, arguments: &[std::ffi::OsString]) -> eframe::Result {
     // Windows: the update helper is a copy of this program started with `--finish-update`. A Nightly
     // build is never updated by the stable feed; ArtCraft Launcher replaces it.
-    #[cfg(windows)]
+    #[cfg(all(windows, feature = "self-update"))]
     if stable_services()
         && let Some(result) = craft_update::self_update::finish(&effectcraft_ui_egui::UPDATE_APP, arguments)
     {
@@ -493,8 +493,11 @@ fn run_desktop(reporter: &crash_report::Shutdown, arguments: &[std::ffi::OsStrin
             // Settings, shortcut presets and the crash-recovery sentinel live in the platform
             // config directory. Agent-driven runs (`--control`) skip crash recovery.
             if let Some(dir) = effectcraft_host::config_dir() {
-                // WebAssembly effect plug-ins in <config>/Plug-ins load before the menus are built.
+                // WebAssembly effect plug-ins in <config>/Plug-ins load before the menus are built
+                // (builds with the `plugins` feature).
+                #[cfg(feature = "plugins")]
                 let plugins = dir.join(effectcraft_engine::commands::PLUGINS_DIR);
+                #[cfg(feature = "plugins")]
                 if plugins.is_dir() {
                     let _ = session.execute("effect.plugins.load", json!({"folder": plugins.to_string_lossy()}));
                     // Packages installed from the Plug-in Library (<config>/Plug-ins/Library).

@@ -9,22 +9,32 @@ rust-version.workspace = true
 [lints]
 workspace = true
 
+[features]
+default = ["plugins", "scripting", "model-download"]
+# WebAssembly effect plug-ins (wasmi, native only) and the external effect helpers (child
+# processes): `effect.plugins.load`, the Plug-in Library, `effect.helpers.*`.
+plugins = ["dep:effectcraft-plugin", "dep:effectcraft-helper-host", "effectcraft-engine/plugins"]
+# The JavaScript script runner: `script.run`, File ▸ Scripts, the Script Console.
+scripting = ["dep:effectcraft-script", "effectcraft-engine/scripting"]
+# Model weight downloads (`roto.model.download`, `face.model.download`).
+model-download = ["effectcraft-engine/model-download"]
+
 [dependencies]
 effectcraft-engine = { workspace = true }
 effectcraft-project = { workspace = true }
 log = { workspace = true }
 effectcraft-media = { workspace = true }
 effectcraft-expr = { workspace = true }
-effectcraft-script = { workspace = true }
+effectcraft-script = { workspace = true, optional = true }
 effectcraft-export = { workspace = true }
-effectcraft-plugin = { workspace = true }
+effectcraft-plugin = { workspace = true, optional = true }
 serde_json = { workspace = true }
 
 # WebAssembly effect plug-ins run in wasmi on native builds.
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-effectcraft-plugin = { workspace = true, features = ["wasm"] }
+effectcraft-plugin = { workspace = true, optional = true, features = ["wasm"] }
 # External effect helpers: separate processes, so their native code can't take the app down.
-effectcraft-helper-host = { workspace = true }
+effectcraft-helper-host = { workspace = true, optional = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

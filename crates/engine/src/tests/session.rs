@@ -511,9 +511,9 @@ fn save_and_open_roundtrip() {
 #[test]
 fn help_links_emit_urls() {
     let mut s = Session::default();
-    let r = s.execute("help.discord", json!({})).unwrap();
-    assert_eq!(r["url"], "https://discord.gg/artcraft");
-    assert!(s.drain_events().iter().any(|e| matches!(e, crate::Event::OpenUrl(u) if u.contains("discord"))));
+    let r = s.execute("help.appPage", json!({})).unwrap();
+    assert_eq!(r["url"], "https://github.com/storytold/effectcraft");
+    assert!(s.drain_events().iter().any(|e| matches!(e, crate::Event::OpenUrl(u) if u.contains("github.com"))));
     assert_eq!(s.execute("help.github", json!({})).unwrap()["url"], "https://github.com/storytold/effectcraft");
 }
 

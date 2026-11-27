@@ -636,6 +636,8 @@ fn install(s: &mut Session, p: &Value, task: Task) -> Result<Value> {
     Ok(json!({"id": m.id, "path": dest.display().to_string()}))
 }
 
+/// `*.model.download` (the `model-download` feature): fetch the official weights with the system curl.
+#[cfg(feature = "model-download")]
 fn download(s: &mut Session, p: &Value, task: Task) -> Result<Value> {
     let k = kind(task);
     let cmd = format!("{}.model.download", k.prefix);
@@ -710,6 +712,7 @@ pub fn specs() -> Vec<CommandSpec> {
             always,
             |s, p| install(s, p, Task::Mask)
         ),
+        #[cfg(feature = "model-download")]
         cmd!(
             "roto.model.download",
             "Download Roto Brush Model",
@@ -739,6 +742,7 @@ pub fn specs() -> Vec<CommandSpec> {
             always,
             |s, p| install(s, p, Task::Face)
         ),
+        #[cfg(feature = "model-download")]
         cmd!(
             "face.model.download",
             "Download Face Tracking Model",
@@ -757,7 +761,7 @@ mod availability_tests {
     use super::*;
 
     /// SAM 2 cannot start a network operation; file installation still verifies the published hash.
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "model-download"))]
     #[test]
     fn sam2_is_install_from_file_only() {
         let mut session = Session::default();

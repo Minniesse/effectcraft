@@ -183,6 +183,7 @@ pub fn session() -> Session {
         importer: Some(Arc::new(files::WebImporter { pool })),
         expr: Some(Arc::new(effectcraft_expr::Expressions)),
         expr_check: Some(effectcraft_expr::check_syntax),
+        #[cfg(feature = "scripting")]
         script: Some(effectcraft_host::script::runner),
         exporter: Some(Arc::new(effectcraft_host::FileExporter { sink: Some(files::export_sink()) })),
         config: Some(Arc::new(persist::config())),

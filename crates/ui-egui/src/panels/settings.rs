@@ -375,17 +375,12 @@ fn theme_preview(ui: &mut egui::Ui, kind: ThemeKind, width: f32) {
     painter.rect_filled(rect, 3.0, p.app_bg);
     let bar = Rect::from_min_size(rect.min, vec2(rect.width(), 13.0));
     painter.rect_filled(bar, 0.0, p.header_bg);
-    // The brand mark, the tools (the Selection tool is active) and the Discord pill.
+    // An accent square and the tools (the Selection tool is active).
     painter.rect_filled(Rect::from_min_size(bar.min + vec2(4.0, 3.0), vec2(7.0, 7.0)), 2.0, p.accent);
     for i in 0..7 {
         let c = if i == 0 { p.accent } else { p.icon };
         painter.rect_filled(Rect::from_min_size(bar.min + vec2(16.0 + i as f32 * 8.0, 4.0), vec2(5.0, 5.0)), 1.0, c);
     }
-    painter.rect_filled(
-        Rect::from_min_max(pos2(bar.right() - 22.0, bar.top() + 3.0), pos2(bar.right() - 4.0, bar.bottom() - 3.0)),
-        3.5,
-        egui::Color32::from_rgb(0x58, 0x65, 0xf2),
-    );
     let gap = 2.0;
     let body = Rect::from_min_max(pos2(rect.left() + gap, bar.bottom() + gap), pos2(rect.right() - gap, rect.bottom() - gap));
     let right_w = (body.width() * 0.22).round();
@@ -646,7 +641,9 @@ fn models_ui(app: &mut EffectcraftApp, ui: &mut egui::Ui, t: &Tokens, acts: &mut
                 return;
             }
             ui.horizontal(|ui| {
-                if !installed && !web && m["url"].as_str().is_some_and(|url| !url.is_empty()) {
+                // A build without model downloads has no `*.model.download` command: no Download button.
+                let downloads = effectcraft_engine::commands::find(&format!("{prefix}.model.download")).is_some();
+                if !installed && !web && downloads && m["url"].as_str().is_some_and(|url| !url.is_empty()) {
                     let r = ui.add_enabled(busy.is_none(), egui::Button::new(tr("Download")));
                     reg(app, &format!("settings.{prefix}.download.{id}"), &r, "Download");
                     if r.clicked() {
@@ -1434,5 +1431,28 @@ mod tests {
         assert_eq!(super::localize_repaint(&LocalizeReport::default()), None, "idle");
         assert!(super::localize_repaint(&LocalizeReport { queued: 2, ..Default::default() }).is_some(), "queued");
         assert!(super::localize_repaint(&LocalizeReport { copying: Some("x.exr".into()), ..Default::default() }).is_some(), "copying");
+    }
+
+    /// The theme preview pictures no Discord button: none of its fills is Discord blurple (#5865F2),
+    /// in any theme.
+    #[test]
+    fn the_theme_preview_draws_no_discord_pill() {
+        fn fills(shape: &egui::Shape, out: &mut Vec<egui::Color32>) {
+            match shape {
+                egui::Shape::Rect(r) => out.push(r.fill),
+                egui::Shape::Vec(v) => v.iter().for_each(|s| fills(s, out)),
+                _ => {}
+            }
+        }
+        let blurple = egui::Color32::from_rgb(0x58, 0x65, 0xf2);
+        for kind in [ThemeKind::Dark, ThemeKind::Darker, ThemeKind::Light] {
+            let ctx = egui::Context::default();
+            let mut frame = ctx.run_ui(Default::default(), |ui| theme_preview(ui, kind, 160.0));
+            frame.textures_delta.clear();
+            let mut out = Vec::new();
+            frame.shapes.iter().for_each(|c| fills(&c.shape, &mut out));
+            assert!(!out.is_empty(), "{kind:?}: the preview drew nothing");
+            assert!(!out.contains(&blurple), "{kind:?}: the preview draws a Discord pill");
+        }
     }
 }

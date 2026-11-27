@@ -9,6 +9,19 @@ rust-version.workspace = true
 [lints]
 workspace = true
 
+[features]
+default = ["model-download", "plugins", "scripting"]
+# `roto.model.download` and `face.model.download`: fetch model weights with the system curl.
+# Without it those commands are unknown; Install from File still works.
+model-download = []
+# The Plug-in Library's https downloads from GitHub (catalog, packages; the system curl). Without
+# it they answer "not available in this build"; the WebAssembly runtime itself is in
+# `effectcraft-plugin`, which `effectcraft-host` links only with its own `plugins` feature.
+plugins = []
+# The script commands (`script.run`, File ▸ Scripts, ScriptUI panels) and their menu items. The
+# runner itself is `effectcraft-script`, which `effectcraft-host` links with its `scripting`.
+scripting = []
+
 [dependencies]
 craft-docpath = { workspace = true }
 effectcraft-time = { workspace = true }

@@ -59,9 +59,11 @@ effectcraft-pdf = { path = "crates/pdf" }
 effectcraft-psd = { path = "crates/psd" }
 effectcraft-aep = { path = "crates/aep" }
 effectcraft-svg = { path = "crates/svg" }
-effectcraft-engine = { path = "crates/engine" }
-effectcraft-host = { path = "crates/host" }
-effectcraft-ui-egui = { path = "crates/ui-egui" }
+# Members get these without their default features (the gated features); the apps (CLI, web,
+# desktop) turn the gates on by default and forward them.
+effectcraft-engine = { path = "crates/engine", default-features = false }
+effectcraft-host = { path = "crates/host", default-features = false }
+effectcraft-ui-egui = { path = "crates/ui-egui", default-features = false }
 effectcraft-automation = { path = "crates/automation" }
 effectcraft-script = { path = "crates/script" }
 effectcraft-plugin = { path = "crates/plugin" }
